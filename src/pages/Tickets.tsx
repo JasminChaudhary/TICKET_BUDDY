@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
+import { cn, getOpeningHoursByDay, getLastAdmissionTime } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 
 const Tickets: React.FC = () => {
@@ -124,7 +124,11 @@ const Tickets: React.FC = () => {
                     <h3 className="font-medium text-museum-900 dark:text-white mb-2">Selected Visit Day</h3>
                     <p className="text-museum-700 dark:text-museum-300 mb-1">{formattedDate}</p>
                     <p className="text-sm text-museum-500 dark:text-museum-400">
-                      Opening hours: 10:00 AM - 6:00 PM
+                      {/* Display opening hours based on the day of the week */}
+                      Opening hours: {getOpeningHoursByDay(selectedDate)}
+                    </p>
+                    <p className="text-sm text-museum-500 dark:text-museum-400">
+                      Last admission: {getLastAdmissionTime(getOpeningHoursByDay(selectedDate))}
                     </p>
                   </div>
                 )}
@@ -199,7 +203,7 @@ const Tickets: React.FC = () => {
 
               {/* Exhibition Tickets */}
               <div>
-                <h3 className="text-lg font-medium text-museum-900 dark:text-white mb-4">Special Exhibitions</h3>
+                <h3 className="text-lg font-medium text-museum-900 dark:text-white mb-4">Exhibitions</h3>
                 <div className="space-y-4">
                   {ticketTypes.filter(ticket => ticket.isExhibition).map((ticket) => (
                     <div 
@@ -250,6 +254,12 @@ const Tickets: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                  
+                  {ticketTypes.filter(ticket => ticket.isExhibition).length === 0 && (
+                    <div className="text-center py-4 text-museum-500 dark:text-museum-400">
+                      No Exhibitions available at this time.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -281,7 +291,7 @@ const Tickets: React.FC = () => {
                 return (
                   <div key={ticketId} className="flex justify-between items-center">
                     <span className="text-museum-700 dark:text-museum-300">
-                      {t(`tickets.${ticketId}`)} x {quantity}:
+                      {ticket.isExhibition ? ticket.name : t(`tickets.${ticketId}`)} x {quantity}:
                     </span>
                     <span className="font-medium text-museum-900 dark:text-white">
                       ${(ticket.price * quantity).toFixed(2)}

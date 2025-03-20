@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from './LanguageContext';
 import { toast } from '@/hooks/use-toast';
+import axios from 'axios';
 
 // Message types
 export type MessageType = 'user' | 'bot' | 'system';
@@ -100,30 +101,7 @@ const availableTicketTypes: TicketType[] = [
     description: 'For students with valid ID',
     available: true,
   },
-  {
-    id: 'modern_masterpieces',
-    name: 'Modern Masterpieces Exhibition',
-    price: 25,
-    description: 'Special exhibition featuring modern art masterpieces',
-    available: true,
-    isExhibition: true,
-  },
-  {
-    id: 'ancient_civilizations',
-    name: 'Ancient Civilizations Exhibition',
-    price: 25,
-    description: 'Journey through the ancient world civilizations',
-    available: true,
-    isExhibition: true,
-  },
-  {
-    id: 'natural_wonders',
-    name: 'Natural Wonders Exhibition',
-    price: 25,
-    description: 'Explore the wonders of the natural world',
-    available: true,
-    isExhibition: true,
-  },
+  
 ];
 
 // ChatbotProvider component
@@ -132,13 +110,43 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [ticketTypes] = useState<TicketType[]>(availableTicketTypes);
+  const [ticketTypes, setTicketTypes] = useState<TicketType[]>(availableTicketTypes.filter(ticket => !ticket.isExhibition));
   const [selectedTickets, setSelectedTickets] = useState<Record<string, number>>({});
   const [totalPrice, setTotalPrice] = useState(0);
   
   const { language, t } = useLanguage();
   const navigate = useNavigate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Fetch exhibitions from the API
+  useEffect(() => {
+    const fetchExhibitions = async () => {
+      try {
+        const response = await axios.get('/api/exhibitions');
+        const apiExhibitions = response.data.exhibitions;
+        
+        // Transform API exhibitions to ticket types
+        const exhibitionTickets = apiExhibitions.map((exhibition: any) => ({
+          id: exhibition._id,
+          name: exhibition.name,
+          price: exhibition.price,
+          description: exhibition.description,
+          available: exhibition.status === 'active',
+          isExhibition: true,
+        }));
+        
+        // Combine general admission tickets with exhibition tickets
+        setTicketTypes([
+          ...availableTicketTypes.filter(ticket => !ticket.isExhibition),
+          ...exhibitionTickets
+        ]);
+      } catch (error) {
+        console.error('Error fetching exhibitions for tickets:', error);
+      }
+    };
+    
+    fetchExhibitions();
+  }, []);
   
   // Initialize the chat with a welcome message
   useEffect(() => {
@@ -278,7 +286,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return {
           id: responseId,
           type: 'bot',
-          content: 'Our museum is open Tuesday to Sunday from 10:00 AM to 6:00 PM. We are closed on Mondays and major holidays. Last admission is at 5:00 PM.',
+          content: 'Our opening hours:\n• Monday: Closed\n• Tuesday - Friday: 10:00 - 18:00\n• Saturday - Sunday: 09:00 - 20:00\n• Public Holidays: 10:00 - 16:00\n\nPlease note that last admission is 1 hour before closing.',
           timestamp: new Date(),
         };
       
@@ -383,26 +391,33 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
         break;
       
       case 'current_exhibitions':
-        addBotMessage('Our current exhibitions include "Modern Masterpieces," "Ancient Civilizations," and "Natural Wonders." Would you like more details about any of these?', [
-          { text: 'Modern Masterpieces', value: 'exhibition_modern' },
-          { text: 'Ancient Civilizations', value: 'exhibition_ancient' },
-          { text: 'Natural Wonders', value: 'exhibition_nature' },
-        ]);
+        // Get active exhibitions from ticketTypes
+        const currentExhibitions = ticketTypes
+          .filter(ticket => ticket.isExhibition && ticket.available)
+          .map(ticket => ticket.name)
+          .join('", "');
+        
+        if (currentExhibitions) {
+          addBotMessage(`Our current exhibitions include "${currentExhibitions}." Would you like more details about any of these?`, [
+            ...ticketTypes
+              .filter(ticket => ticket.isExhibition && ticket.available)
+              .map(ticket => ({ 
+                text: ticket.name, 
+                value: `exhibition_${ticket.id}` 
+              })),
+            { text: 'View all exhibitions', value: 'view_exhibitions' },
+          ]);
+        } else {
+          addBotMessage('We currently don\'t have any active exhibitions. Please check back later or visit our exhibitions page for upcoming shows.', [
+            { text: 'View all exhibitions', value: 'view_exhibitions' },
+          ]);
+        }
         break;
       
       case 'upcoming_exhibitions':
         addBotMessage('We have exciting upcoming exhibitions including "Digital Art Revolution" (starting next month) and "Indigenous Cultures" (in three months). Would you like to be notified when these open?', [
           { text: 'Notify me', value: 'exhibition_notify' },
           { text: 'More information', value: 'exhibition_upcoming_info' },
-        ]);
-        break;
-      
-      case 'exhibition_modern':
-      case 'exhibition_ancient':
-      case 'exhibition_nature':
-        addBotMessage('This exhibition showcases remarkable works that have defined our understanding of art and culture. Would you like to book tickets to see this exhibition?', [
-          { text: 'Book tickets', value: 'go_to_booking' },
-          { text: 'View all exhibitions', value: 'view_exhibitions' },
         ]);
         break;
       
@@ -437,7 +452,25 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addBotMessage('Our upcoming "Digital Art Revolution" exhibition will feature cutting-edge works by renowned digital artists, interactive installations, and virtual reality experiences. "Indigenous Cultures" will showcase art, artifacts, and cultural expressions from indigenous communities around the world.');
         break;
       
+      // Handle dynamic exhibition selection
       default:
+        if (value.startsWith('exhibition_')) {
+          const exhibitionId = value.replace('exhibition_', '');
+          const exhibition = ticketTypes.find(ticket => ticket.id === exhibitionId);
+          
+          if (exhibition) {
+            addBotMessage(`${exhibition.name}: ${exhibition.description} Would you like to book tickets to see this exhibition?`, [
+              { text: 'Book tickets', value: 'go_to_booking' },
+              { text: 'View all exhibitions', value: 'view_exhibitions' },
+            ]);
+          } else {
+            addBotMessage("I couldn't find information about that exhibition. Would you like to see our available exhibitions?", [
+              { text: 'View all exhibitions', value: 'view_exhibitions' },
+            ]);
+          }
+          break;
+        }
+        
         addBotMessage("I'm not sure how to handle that request. Can I help you with something else?", [
           { text: t('tickets.title'), value: 'buy_tickets' },
           { text: t('nav.exhibitions'), value: 'exhibition_info' },

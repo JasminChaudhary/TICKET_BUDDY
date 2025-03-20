@@ -84,7 +84,7 @@ const Home = () => {
             date: formatDate(startDate, endDate),
             image: exhibition.imageUrl,
             category: category,
-            duration: '9:00 AM - 5:00 PM',  // Default hours
+            duration: '10:00 AM - 6:00 PM',  // Default hours
             location: 'Main Exhibition Hall',  // Default location
             price: exhibition.price
           };

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Share2, Ticket } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { cn, OPENING_HOURS } from '@/lib/utils';
 import axios from 'axios';
 
 // Backend Exhibition interface
@@ -86,7 +86,7 @@ const Exhibitions = () => {
             date: formatDate(startDate, endDate),
             image: exhibition.imageUrl,
             category: category,
-            duration: '9:00 AM - 5:00 PM',  // Default hours
+            duration: 'See opening hours below',  // Updated to reference opening hours
             location: 'Main Exhibition Hall',  // Default location
             price: exhibition.price
           };
@@ -136,6 +136,18 @@ const Exhibitions = () => {
           <p className="text-museum-600 dark:text-museum-300 max-w-2xl mx-auto">
             Explore our current, upcoming, and past exhibitions showcasing art, history, and culture from around the world.
           </p>
+        </div>
+        
+        {/* Opening Hours Information */}
+        <div className="bg-museum-50 dark:bg-museum-800 rounded-lg p-6 max-w-2xl mx-auto">
+          <h2 className="font-display text-xl font-bold text-museum-900 dark:text-white mb-3">Opening Hours</h2>
+          <ul className="space-y-1 text-museum-700 dark:text-museum-300">
+            <li className="flex justify-between"><span>Monday:</span> <span>{OPENING_HOURS.monday}</span></li>
+            <li className="flex justify-between"><span>Tuesday - Friday:</span> <span>{OPENING_HOURS.tuesdayToFriday}</span></li>
+            <li className="flex justify-between"><span>Saturday - Sunday:</span> <span>{OPENING_HOURS.weekends}</span></li>
+            <li className="flex justify-between"><span>Public Holidays:</span> <span>{OPENING_HOURS.publicHolidays}</span></li>
+          </ul>
+          <p className="mt-3 text-sm text-museum-600 dark:text-museum-400">Last admission is 1 hour before closing.</p>
         </div>
         
         {/* Exhibition Tabs */}
