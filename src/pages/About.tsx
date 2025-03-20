@@ -277,7 +277,7 @@ const About: React.FC = () => {
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">Education</dt>
-                            <dd className="text-museum-900 dark:text-white">chaudharyjasmin645@gmail.com</dd>
+                            <dd className="text-museum-900 dark:text-white">anshulavaiya@gmail.com</dd>
                           </div>
                         </dl>
                       </div>
