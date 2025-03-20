@@ -98,95 +98,16 @@ const Exhibitions = () => {
       } catch (error) {
         console.error('Error fetching exhibitions:', error);
         setLoading(false);
-        // Fall back to mock data if API fails
-        setExhibitions(mockExhibitions);
-        setLoaded(true);
+        toast({
+          title: 'Error',
+          description: 'Failed to load exhibitions. Please try again later.',
+          variant: 'destructive',
+        });
       }
     };
     
     fetchExhibitions();
   }, []);
-  
-  // Mock exhibitions data as fallback
-  const mockExhibitions: Exhibition[] = [
-    {
-      id: 'modern-masters',
-      title: 'Modern Masterpieces',
-      description: 'Discover iconic works from the most influential artists of the modern era, showcasing revolutionary techniques and groundbreaking artistic movements that shaped the 20th century.',
-      date: 'April 15 - August 30, 2023',
-      image: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=2080',
-      category: 'current',
-      duration: '9:00 AM - 6:00 PM',
-      location: 'East Wing, Floor 2',
-      price: 15
-    },
-    {
-      id: 'ancient-civilizations',
-      title: 'Ancient Civilizations',
-      description: 'Journey through time to explore the artifacts, art, and architecture of the world\'s great ancient civilizations, from Egypt and Mesopotamia to Greece, Rome, and beyond.',
-      date: 'May 10 - October 15, 2023',
-      image: 'https://images.unsplash.com/photo-1564399579883-451a5cb0507e?q=80&w=2071',
-      category: 'current',
-      duration: '10:00 AM - 5:00 PM',
-      location: 'North Wing, Floor 1',
-      price: 12
-    },
-    {
-      id: 'natural-wonders',
-      title: 'Natural Wonders',
-      description: 'Experience the beauty and complexity of our natural world through stunning photography, interactive displays, and scientific specimens that reveal Earth\'s extraordinary biodiversity.',
-      date: 'June 5 - September 20, 2023',
-      image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?q=80&w=2069',
-      category: 'current',
-      duration: '9:00 AM - 7:00 PM',
-      location: 'West Wing, Floor 3',
-      price: 10
-    },
-    {
-      id: 'digital-revolution',
-      title: 'Digital Art Revolution',
-      description: 'Explore the cutting-edge of artistic expression with immersive installations, digital sculptures, and interactive media created by renowned digital artists pushing the boundaries of technology.',
-      date: 'November 10, 2023 - February 15, 2024',
-      image: 'https://images.unsplash.com/photo-1635322966219-b75ed372eb01?q=80&w=2064',
-      category: 'upcoming',
-      duration: '10:00 AM - 8:00 PM',
-      location: 'South Wing, Floor 2',
-      price: 18
-    },
-    {
-      id: 'indigenous-cultures',
-      title: 'Indigenous Cultures',
-      description: 'Celebrate the rich heritage and contemporary expressions of indigenous peoples from around the world through traditional artifacts, contemporary art, and multimedia presentations.',
-      date: 'December 5, 2023 - March 30, 2024',
-      image: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?q=80&w=1974',
-      category: 'upcoming',
-      duration: '9:00 AM - 6:00 PM',
-      location: 'East Wing, Floor 1',
-      price: 14
-    },
-    {
-      id: 'renaissance-masters',
-      title: 'Renaissance Masters',
-      description: 'Rediscover the genius of the Renaissance through an extraordinary collection of paintings, sculptures, and drawings that defined one of history\'s most influential artistic periods.',
-      date: 'January 15 - May 10, 2023',
-      image: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988a5?q=80&w=2070',
-      category: 'past',
-      duration: '10:00 AM - 5:00 PM',
-      location: 'North Wing, Floor 2',
-      price: 15
-    },
-    {
-      id: 'abstract-expressions',
-      title: 'Abstract Expressions',
-      description: 'Experience the power of abstract art through a stunning selection of works that communicate emotion, ideas, and concepts beyond representation, from early pioneers to contemporary innovators.',
-      date: 'February 20 - June 15, 2023',
-      image: 'https://images.unsplash.com/photo-1536924940846-227afb31e2a5?q=80&w=2066',
-      category: 'past',
-      duration: '9:00 AM - 6:00 PM',
-      location: 'West Wing, Floor 1',
-      price: 12
-    },
-  ];
   
   // Filter exhibitions by category
   const currentExhibitions = exhibitions.filter(exhibition => exhibition.category === 'current');

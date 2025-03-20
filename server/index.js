@@ -3,12 +3,53 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Create uploads directory if it doesn't exist
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for handling file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  // Accept images only
+  if (!file.mimetype.startsWith('image/')) {
+    return cb(new Error('Only image files are allowed!'), false);
+  }
+  cb(null, true);
+};
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: fileFilter
+});
 
 // MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/ticket-buddy', {
@@ -133,6 +174,7 @@ const exhibitionSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
     required: true,
+    trim: true,
   },
   status: {
     type: String,
@@ -406,6 +448,19 @@ app.delete('/api/admin/users/:id', authenticateAdmin, async (req, res) => {
 });
 
 // Get all exhibitions
+app.get('/api/exhibitions', async (req, res) => {
+  try {
+    const exhibitions = await Exhibition.find({})
+      .sort({ startDate: 1 })
+      .select('-__v');
+    res.json({ exhibitions });
+  } catch (error) {
+    console.error('Error fetching exhibitions:', error);
+    res.status(500).json({ message: 'Error fetching exhibitions' });
+  }
+});
+
+// Get all exhibitions for admin
 app.get('/api/admin/exhibitions', authenticateAdmin, async (req, res) => {
   try {
     const exhibitions = await Exhibition.find().sort({ createdAt: -1 });
@@ -416,25 +471,37 @@ app.get('/api/admin/exhibitions', authenticateAdmin, async (req, res) => {
   }
 });
 
-// Create exhibition
+// Create exhibition endpoint
 app.post('/api/admin/exhibitions', authenticateAdmin, async (req, res) => {
   try {
-    const { name, description, startDate, endDate, price, imageUrl } = req.body;
+    const { name, description, startDate, endDate, price, status, imageUrl } = req.body;
     
+    console.log('Creating exhibition with data:', { name, description, startDate, endDate, price, status, imageUrl });
+    
+    if (!imageUrl) {
+      return res.status(400).json({ message: 'Image URL is required' });
+    }
+
     const exhibition = new Exhibition({
       name,
       description,
-      startDate,
-      endDate,
-      price,
-      imageUrl,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      price: Number(price),
+      imageUrl: imageUrl.trim(),
+      status: status || 'active'
     });
-    
+
     await exhibition.save();
-    res.status(201).json({ exhibition });
+    console.log('Exhibition created successfully:', exhibition);
+    
+    res.status(201).json({ 
+      message: 'Exhibition created successfully',
+      exhibition 
+    });
   } catch (error) {
-    console.error('Create exhibition error:', error);
-    res.status(500).json({ message: 'Error creating exhibition' });
+    console.error('Error creating exhibition:', error);
+    res.status(500).json({ message: error.message || 'Error creating exhibition' });
   }
 });
 
@@ -464,16 +531,23 @@ app.put('/api/admin/exhibitions/:id', authenticateAdmin, async (req, res) => {
 // Delete exhibition
 app.delete('/api/admin/exhibitions/:id', authenticateAdmin, async (req, res) => {
   try {
-    const exhibitionId = req.params.id;
-    
-    const exhibition = await Exhibition.findByIdAndDelete(exhibitionId);
+    const exhibition = await Exhibition.findById(req.params.id);
     if (!exhibition) {
       return res.status(404).json({ message: 'Exhibition not found' });
     }
-    
+
+    // Delete the image file if it exists
+    if (exhibition.imageUrl) {
+      const imagePath = path.join(__dirname, exhibition.imageUrl);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    await Exhibition.findByIdAndDelete(req.params.id);
     res.json({ message: 'Exhibition deleted successfully' });
   } catch (error) {
-    console.error('Delete exhibition error:', error);
+    console.error('Error deleting exhibition:', error);
     res.status(500).json({ message: 'Error deleting exhibition' });
   }
 });
@@ -500,23 +574,6 @@ app.get('/api/admin/transactions', authenticateAdmin, async (req, res) => {
   } catch (error) {
     console.error('Get transactions error:', error);
     res.status(500).json({ message: 'Error retrieving transactions' });
-  }
-});
-
-// Public endpoint to get active exhibitions
-app.get('/api/exhibitions', async (req, res) => {
-  try {
-    // Only return active exhibitions that haven't ended yet
-    const currentDate = new Date();
-    const exhibitions = await Exhibition.find({
-      status: 'active',
-      endDate: { $gte: currentDate }
-    }).sort({ startDate: 1 });
-    
-    res.json({ exhibitions });
-  } catch (error) {
-    console.error('Get public exhibitions error:', error);
-    res.status(500).json({ message: 'Error retrieving exhibitions' });
   }
 });
 
@@ -578,6 +635,25 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
   } catch (error) {
     console.error('Get analytics error:', error);
     res.status(500).json({ message: 'Error retrieving analytics' });
+  }
+});
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Image upload endpoint
+app.post('/api/upload', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    
+    // Return the URL for the uploaded file
+    const imageUrl = `/uploads/${path.basename(req.file.path)}`;
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    res.status(500).json({ error: 'Failed to upload file' });
   }
 });
 
