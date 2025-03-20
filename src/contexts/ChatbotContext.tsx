@@ -23,6 +23,8 @@ export interface TicketType {
   description: string;
   available: boolean;
   isExhibition?: boolean;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 // Intent type
@@ -52,6 +54,7 @@ interface ChatbotContextType {
   setSelectedTickets: (tickets: Record<string, number>) => void;
   totalPrice: number;
   resetChat: () => void;
+  isExhibitionAvailable: (exhibitionId: string, date: Date | null) => boolean;
 }
 
 // Create context
@@ -69,6 +72,7 @@ const ChatbotContext = createContext<ChatbotContextType>({
   setSelectedTickets: () => {},
   totalPrice: 0,
   resetChat: () => {},
+  isExhibitionAvailable: () => false,
 });
 
 // Available ticket types
@@ -133,6 +137,8 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
           description: exhibition.description,
           available: exhibition.status === 'active',
           isExhibition: true,
+          startDate: new Date(exhibition.startDate),
+          endDate: new Date(exhibition.endDate)
         }));
         
         // Combine general admission tickets with exhibition tickets
@@ -200,6 +206,32 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Check if exhibition is available on the selected date
+  const isExhibitionAvailable = (exhibitionId: string, date: Date | null): boolean => {
+    if (!date) return false;
+    
+    const exhibition = ticketTypes.find(ticket => ticket.id === exhibitionId);
+    if (!exhibition || !exhibition.isExhibition) return false;
+    
+    const visitDate = new Date(date);
+    // Reset time to compare dates only
+    visitDate.setHours(0, 0, 0, 0);
+    
+    const startDate = exhibition.startDate;
+    const endDate = exhibition.endDate;
+    
+    if (!startDate || !endDate) return false;
+    
+    // Clone the dates and reset time to compare dates only
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    
+    return visitDate >= start && visitDate <= end;
+  };
 
   // Detect intent from user message
   const detectIntent = (message: string): Intent => {
@@ -566,6 +598,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setSelectedTickets,
         totalPrice,
         resetChat,
+        isExhibitionAvailable,
       }}
     >
       {children}

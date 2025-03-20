@@ -419,6 +419,43 @@ app.post('/api/tickets', authenticate, async (req, res) => {
     const { visitDate, tickets, totalPrice, email } = req.body;
     console.log(`Booking tickets for user ${req.user._id}, visit date: ${visitDate}`);
 
+    // Validate that exhibition tickets are available on the selected date
+    const visitDateObj = new Date(visitDate);
+    // Reset time to compare only the date
+    visitDateObj.setHours(0, 0, 0, 0);
+
+    // Check each exhibition ticket
+    const exhibitionTickets = tickets.filter(ticket => ticket.isExhibition);
+    for (const ticket of exhibitionTickets) {
+      // Find the exhibition in the database
+      const exhibition = await Exhibition.findById(ticket.ticketId);
+      if (!exhibition) {
+        return res.status(404).json({ 
+          message: `Exhibition not found: ${ticket.name}` 
+        });
+      }
+
+      // Check if the exhibition is active
+      if (exhibition.status !== 'active') {
+        return res.status(400).json({ 
+          message: `Exhibition is not active: ${ticket.name}` 
+        });
+      }
+
+      // Check if visit date is within exhibition dates
+      const startDate = new Date(exhibition.startDate);
+      startDate.setHours(0, 0, 0, 0);
+      
+      const endDate = new Date(exhibition.endDate);
+      endDate.setHours(23, 59, 59, 999);
+
+      if (visitDateObj < startDate || visitDateObj > endDate) {
+        return res.status(400).json({ 
+          message: `Exhibition "${ticket.name}" is not available on the selected date. Available from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}.` 
+        });
+      }
+    }
+
     // Create new ticket booking
     const newTicket = new Ticket({
       userId: req.user._id,

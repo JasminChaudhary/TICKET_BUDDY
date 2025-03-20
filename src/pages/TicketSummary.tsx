@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 const TicketSummary: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { selectedDate, selectedTickets, ticketTypes, totalPrice } = useChatbot();
+  const { selectedDate, selectedTickets, ticketTypes, totalPrice, isExhibitionAvailable } = useChatbot();
   
   const [isLoaded, setIsLoaded] = useState(false);
   
@@ -48,17 +48,55 @@ const TicketSummary: React.FC = () => {
         variant: 'destructive',
       });
       navigate('/tickets');
+      return;
     }
-  }, [selectedDate, selectedTickets, ticketTypes, navigate]);
+    
+    // Validate that all selected exhibition tickets are available on the selected date
+    const selectedExhibitions = Object.entries(selectedTickets)
+      .filter(([_, quantity]) => quantity > 0)
+      .map(([ticketId]) => ticketId)
+      .filter(ticketId => ticketTypes.find(ticket => ticket.id === ticketId)?.isExhibition);
+    
+    const unavailableExhibitions = selectedExhibitions
+      .filter(ticketId => !isExhibitionAvailable(ticketId, selectedDate))
+      .map(ticketId => ticketTypes.find(ticket => ticket.id === ticketId)?.name);
+    
+    if (unavailableExhibitions.length > 0) {
+      toast({
+        title: 'Exhibitions not available',
+        description: `The following exhibitions are not available on your selected date: ${unavailableExhibitions.join(', ')}. Please select a different date or exhibitions.`,
+        variant: 'destructive',
+      });
+      navigate('/tickets');
+      return;
+    }
+  }, [selectedDate, selectedTickets, ticketTypes, navigate, isExhibitionAvailable]);
   
   // Format date for display
   const formattedDate = selectedDate ? format(selectedDate, 'EEEE, MMMM d, yyyy') : '';
   
+  // Format ticket for display in order summary
+  const formatTicket = (ticketId: string, quantity: number) => {
+    const ticket = ticketTypes.find(t => t.id === ticketId);
+    if (!ticket) return null;
+    
+    return (
+      <div key={ticketId} className="flex justify-between items-center">
+        <span className="text-museum-700 dark:text-museum-300">
+          {ticket.isExhibition ? ticket.name : t(`tickets.${ticketId}`)} x {quantity}:
+        </span>
+        <span className="font-medium text-museum-900 dark:text-white">
+          ${(ticket.price * quantity).toFixed(2)}
+        </span>
+      </div>
+    );
+  };
+  
   // Total ticket count
-  const totalTickets = Object.values(selectedTickets).reduce((sum, qty) => sum + qty, 0);
+  const totalTickets = Object.values(selectedTickets).reduce<number>((sum, qty) => sum + (qty || 0), 0);
   
   // Check if tickets are selected
-  const hasTickets = Object.values(selectedTickets).some(qty => qty > 0);
+  const hasTickets = Object.values(selectedTickets).some(qty => (qty || 0) > 0);
   
   // Navigate to payment page
   const proceedToPayment = () => {
@@ -118,22 +156,7 @@ const TicketSummary: React.FC = () => {
                 {Object.entries(selectedTickets).map(([ticketId, quantity]) => {
                   if (quantity === 0) return null;
                   
-                  const ticket = ticketTypes.find(t => t.id === ticketId);
-                  if (!ticket) return null;
-                  
-                  return (
-                    <div key={ticketId} className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-accent-700 dark:text-accent-400 mr-2" />
-                        <span className="text-museum-700 dark:text-museum-300">
-                          {t(`tickets.${ticketId}`)} x {quantity}:
-                        </span>
-                      </div>
-                      <span className="font-medium text-museum-900 dark:text-white">
-                        ${(ticket.price * quantity).toFixed(2)}
-                      </span>
-                    </div>
-                  );
+                  return formatTicket(ticketId, quantity);
                 })}
                 <div className="border-t border-museum-200 dark:border-museum-700 mt-3 pt-3 flex justify-between">
                   <span className="font-medium text-museum-900 dark:text-white">Total Tickets:</span>

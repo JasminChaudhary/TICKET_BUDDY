@@ -15,7 +15,7 @@ import { toast } from '@/hooks/use-toast';
 const Tickets: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { ticketTypes, selectedTickets, setSelectedTickets, selectedDate, setSelectedDate, totalPrice } = useChatbot();
+  const { ticketTypes, selectedTickets, setSelectedTickets, selectedDate, setSelectedDate, totalPrice, isExhibitionAvailable } = useChatbot();
   
   const [loaded, setLoaded] = useState(false);
   
@@ -31,6 +31,20 @@ const Tickets: React.FC = () => {
   
   // Update ticket quantities
   const updateTicketQuantity = (ticketId: string, amount: number) => {
+    // If adding an exhibition ticket, check if it's available on the selected date
+    if (amount > 0) {
+      const ticket = ticketTypes.find(t => t.id === ticketId);
+      if (ticket?.isExhibition && !isExhibitionAvailable(ticketId, selectedDate)) {
+        const exhibition = ticketTypes.find(t => t.id === ticketId);
+        toast({
+          title: 'Exhibition not available',
+          description: `${exhibition?.name} is not available on your selected visit date. Please choose another date or a different exhibition.`,
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+    
     setSelectedTickets({
       ...selectedTickets,
       [ticketId]: Math.max(0, (selectedTickets[ticketId] || 0) + amount),
@@ -86,6 +100,25 @@ const Tickets: React.FC = () => {
       toast({
         title: 'Missing exhibition ticket',
         description: 'Please select at least one exhibition ticket to proceed.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // Validate that all selected exhibition tickets are available on the selected date
+    const selectedExhibitions = Object.entries(selectedTickets)
+      .filter(([_, quantity]) => quantity > 0)
+      .map(([ticketId]) => ticketId)
+      .filter(ticketId => ticketTypes.find(ticket => ticket.id === ticketId)?.isExhibition);
+    
+    const unavailableExhibitions = selectedExhibitions
+      .filter(ticketId => !isExhibitionAvailable(ticketId, selectedDate))
+      .map(ticketId => ticketTypes.find(ticket => ticket.id === ticketId)?.name);
+    
+    if (unavailableExhibitions.length > 0) {
+      toast({
+        title: 'Exhibitions not available',
+        description: `The following exhibitions are not available on your selected date: ${unavailableExhibitions.join(', ')}. Please choose another date or different exhibitions.`,
         variant: 'destructive',
       });
       return;
@@ -236,13 +269,21 @@ const Tickets: React.FC = () => {
                   {ticketTypes.filter(ticket => ticket.isExhibition).map((ticket) => (
                     <div 
                       key={ticket.id}
-                      className="p-4 rounded-lg bg-museum-50 dark:bg-museum-800 border border-museum-100 dark:border-museum-700 flex items-center justify-between gap-4"
+                      className={cn(
+                        "p-4 rounded-lg bg-museum-50 dark:bg-museum-800 border border-museum-100 dark:border-museum-700 flex items-center justify-between gap-4",
+                        !isExhibitionAvailable(ticket.id, selectedDate) && "opacity-50"
+                      )}
                     >
                       <div>
                         <div className="flex items-center gap-2">
                           <h3 className="font-medium text-museum-900 dark:text-white">
                             {ticket.name}
                           </h3>
+                          {!isExhibitionAvailable(ticket.id, selectedDate) && (
+                            <span className="px-2 py-1 rounded text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">
+                              Not available on selected date
+                            </span>
+                          )}
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-6 w-6">
@@ -251,6 +292,11 @@ const Tickets: React.FC = () => {
                             </PopoverTrigger>
                             <PopoverContent className="w-80">
                               <p className="text-sm">{ticket.description}</p>
+                              {ticket.startDate && ticket.endDate && (
+                                <p className="text-sm mt-2">
+                                  <strong>Available:</strong> {format(ticket.startDate, 'PP')} - {format(ticket.endDate, 'PP')}
+                                </p>
+                              )}
                             </PopoverContent>
                           </Popover>
                         </div>
@@ -276,6 +322,7 @@ const Tickets: React.FC = () => {
                           size="icon"
                           className="h-8 w-8 rounded-full"
                           onClick={() => updateTicketQuantity(ticket.id, 1)}
+                          disabled={!isExhibitionAvailable(ticket.id, selectedDate)}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
