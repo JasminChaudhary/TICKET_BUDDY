@@ -1,69 +1,83 @@
-# Welcome to your Lovable project
+# Ticket Buddy 🎫
 
-## Project info
+A modern web application for managing event tickets and bookings with a user-friendly interface.
 
-**URL**: https://lovable.dev/projects/e4851989-e949-4399-bf80-41a30133e1d2
+## About the Project
 
-## How can I edit this code?
+Ticket Buddy is a full-stack application that helps users browse, book, and manage event tickets. Built with modern web technologies, it offers a seamless experience for both event organizers and attendees.
 
-There are several ways of editing your application.
+### Features
 
-**Use Lovable**
+- 🔐 User authentication and authorization
+- 🎫 Ticket browsing and booking
+- 💳 Secure payment processing
+- 📱 Responsive design for all devices
+- 🌙 Dark/Light mode support
+- 🌍 Multi-language support
+- 📊 User dashboard for managing bookings
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e4851989-e949-4399-bf80-41a30133e1d2) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend:**
+  - React with TypeScript
+  - Vite for fast development
+  - Tailwind CSS for styling
+  - shadcn/ui for beautiful components
 
-**Use your preferred IDE**
+- **Backend:**
+  - Node.js
+  - Express.js
+  - MongoDB for database
+  - JWT for authentication
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
 
-Follow these steps:
+- Node.js (v14 or higher)
+- npm or yarn
+- MongoDB (for local development)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. Clone the repository
+```bash
+git clone https://github.com/JasminChaudhary/Ticket_Buddy.git
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Navigate to the project directory
+```bash
+cd Ticket_Buddy
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Install dependencies
+```bash
+npm install
+```
+
+4. Create a `.env` file in the root directory and add your environment variables:
+```env
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+```
+
+5. Start the development server
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Contributing
 
-**Use GitHub Codespaces**
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## License
 
-## What technologies are used for this project?
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-This project is built with .
+## Contact
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Jasmin Chaudhary - [GitHub](https://github.com/JasminChaudhary)
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e4851989-e949-4399-bf80-41a30133e1d2) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+Project Link: [https://github.com/JasminChaudhary/Ticket_Buddy](https://github.com/JasminChaudhary/Ticket_Buddy)
