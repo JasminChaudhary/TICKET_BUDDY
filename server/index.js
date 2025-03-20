@@ -784,6 +784,25 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}); 
+
+const startServer = () => {
+  const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  }).on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${PORT} is in use, trying port ${PORT + 1}`);
+      app.listen(PORT + 1, () => {
+        console.log(`Server running on port ${PORT + 1}`);
+      }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+          console.log(`Port ${PORT + 1} is also in use, trying port ${PORT + 2}`);
+          app.listen(PORT + 2, () => {
+            console.log(`Server running on port ${PORT + 2}`);
+          });
+        }
+      });
+    }
+  });
+};
+
+startServer(); 

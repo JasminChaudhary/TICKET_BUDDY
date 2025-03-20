@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Museum Info */}
           <div className="space-y-4">
-            <h3 className="font-display text-2xl font-bold text-museum-900 dark:text-white">ArtMuseo</h3>
+            <h3 className="font-display text-2xl font-bold text-museum-900 dark:text-white">Ticket Buddy</h3>
             <p className="text-museum-600 dark:text-museum-300 text-sm max-w-xs">
               Discover art, history, and culture in our world-class museum featuring exhibitions from around the globe.
             </p>
@@ -137,7 +137,7 @@ const Footer: React.FC = () => {
         {/* Copyright */}
         <div className="pt-8 mt-8 border-t border-museum-200 dark:border-museum-800 text-center">
           <p className="text-sm text-museum-500 dark:text-museum-400">
-            &copy; {currentYear} ArtMuseo. All rights reserved.
+            &copy; {currentYear} Ticket Buddy. All rights reserved.
           </p>
         </div>
       </div>

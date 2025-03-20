@@ -207,7 +207,7 @@ const TicketSummary: React.FC = () => {
           </Button>
           <Button 
             onClick={proceedToPayment}
-            className="w-full sm:w-auto bg-accent-700 hover:bg-accent-800 text-white"
+            className="w-full sm:w-auto bg-accent-700 hover:bg-accent-800 text-black dark:text-white"
           >
             Continue to Payment
           </Button>

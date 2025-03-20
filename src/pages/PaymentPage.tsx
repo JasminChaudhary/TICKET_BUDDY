@@ -105,7 +105,7 @@ const PaymentPage: React.FC = () => {
       {/* Payment Card */}
       <Card className={cn("border-museum-200 dark:border-museum-700 neomorphic overflow-hidden", isLoaded && "animate-scale-in")}>
         <div className="bg-accent-700 py-3 px-6">
-          <h2 className="text-white font-medium">Secure Checkout</h2>
+          <h2 className="text-black dark:text-white font-medium">Secure Checkout</h2>
         </div>
         
         <CardContent className="pt-6">
@@ -146,7 +146,7 @@ const PaymentPage: React.FC = () => {
                 <div className="pt-4">
                   <Button 
                     onClick={() => navigate('/')}
-                    className="bg-accent-700 hover:bg-accent-800 text-white"
+                    className="bg-accent-700 hover:bg-accent-800 text-black dark:text-white"
                   >
                     Return to Home
                   </Button>

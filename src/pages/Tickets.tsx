@@ -393,10 +393,16 @@ const Tickets: React.FC = () => {
               </div>
             </div>
           </CardContent>
-          <CardFooter>
-            <Button 
-              className="w-full bg-accent-700 hover:bg-accent-800 text-white"
+          <CardFooter className="flex flex-col gap-4">
+            <div className="bg-museum-50 dark:bg-museum-800/50 p-4 rounded-lg border border-museum-100 dark:border-museum-700 text-center">
+              <div className="text-sm text-museum-600 dark:text-museum-400">Total price:</div>
+              <div className="text-xl font-bold text-museum-900 dark:text-white">${totalPrice.toFixed(2)}</div>
+            </div>
+            
+            <Button
               onClick={proceedToCheckout}
+              size="lg"
+              className="mx-auto bg-accent-700 hover:bg-accent-800 text-black dark:text-white"
               disabled={!hasTickets || !selectedDate}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />

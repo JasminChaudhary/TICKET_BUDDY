@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, Moon, Sun, Globe, UserCircle } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe, UserCircle, Landmark, Ticket } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,24 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+
+// Logo component
+const Logo: React.FC = () => {
+  const { isDark } = useTheme();
+  
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center p-1 rounded-lg bg-accent-700">
+        <Landmark className="h-6 w-6 text-white" />
+      </div>
+      <div className="flex items-center">
+        <span className="text-xl font-bold text-museum-900 dark:text-white ml-1">
+        Ticket Buddy
+        </span>
+      </div>
+    </div>
+  );
+}
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,8 +58,8 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="text-xl font-bold">
-                Ticket Buddy
+              <Link to="/" className="hover:opacity-80 transition-opacity">
+                <Logo />
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -124,25 +142,20 @@ const Navbar: React.FC = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  {isDark ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme('light')}>
-                  Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>
-                  Dark
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(isDark ? 'light' : 'dark')}
+              aria-label="Toggle theme"
+            >
+              {isDark ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
