@@ -106,6 +106,47 @@ const ticketSchema = new mongoose.Schema({
 
 const Ticket = mongoose.model('Ticket', ticketSchema);
 
+// Exhibition Schema
+const exhibitionSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  startDate: {
+    type: Date,
+    required: true,
+  },
+  endDate: {
+    type: Date,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active',
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const Exhibition = mongoose.model('Exhibition', exhibitionSchema);
+
 // Authentication middleware
 const authenticate = async (req, res, next) => {
   try {
@@ -145,10 +186,25 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+// Admin authentication middleware
+const authenticateAdmin = async (req, res, next) => {
+  try {
+    await authenticate(req, res, () => {
+      if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Admin access required' });
+      }
+      next();
+    });
+  } catch (error) {
+    console.error('Admin auth middleware error:', error);
+    return res.status(500).json({ message: 'Server error during admin authentication' });
+  }
+};
+
 // Routes
 app.post('/api/signup', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -165,6 +221,7 @@ app.post('/api/signup', async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role: role || 'user', // Allow setting role during signup, default to 'user'
     });
 
     await user.save();
@@ -307,6 +364,220 @@ app.put('/api/tickets/:id/cancel', authenticate, async (req, res) => {
   } catch (error) {
     console.error('Cancel ticket error:', error);
     res.status(500).json({ message: 'Error cancelling ticket' });
+  }
+});
+
+// Admin Routes
+// Get all users
+app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}, '-password').sort({ createdAt: -1 });
+    res.json({ users });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ message: 'Error retrieving users' });
+  }
+});
+
+// Delete user
+app.delete('/api/admin/users/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Prevent deleting the last admin
+    const userToDelete = await User.findById(userId);
+    if (!userToDelete) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    if (userToDelete.role === 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount <= 1) {
+        return res.status(400).json({ message: 'Cannot delete the last admin user' });
+      }
+    }
+    
+    await User.findByIdAndDelete(userId);
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ message: 'Error deleting user' });
+  }
+});
+
+// Get all exhibitions
+app.get('/api/admin/exhibitions', authenticateAdmin, async (req, res) => {
+  try {
+    const exhibitions = await Exhibition.find().sort({ createdAt: -1 });
+    res.json({ exhibitions });
+  } catch (error) {
+    console.error('Get exhibitions error:', error);
+    res.status(500).json({ message: 'Error retrieving exhibitions' });
+  }
+});
+
+// Create exhibition
+app.post('/api/admin/exhibitions', authenticateAdmin, async (req, res) => {
+  try {
+    const { name, description, startDate, endDate, price, imageUrl } = req.body;
+    
+    const exhibition = new Exhibition({
+      name,
+      description,
+      startDate,
+      endDate,
+      price,
+      imageUrl,
+    });
+    
+    await exhibition.save();
+    res.status(201).json({ exhibition });
+  } catch (error) {
+    console.error('Create exhibition error:', error);
+    res.status(500).json({ message: 'Error creating exhibition' });
+  }
+});
+
+// Update exhibition
+app.put('/api/admin/exhibitions/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const exhibitionId = req.params.id;
+    const updates = req.body;
+    
+    const exhibition = await Exhibition.findByIdAndUpdate(
+      exhibitionId,
+      updates,
+      { new: true, runValidators: true }
+    );
+    
+    if (!exhibition) {
+      return res.status(404).json({ message: 'Exhibition not found' });
+    }
+    
+    res.json({ exhibition });
+  } catch (error) {
+    console.error('Update exhibition error:', error);
+    res.status(500).json({ message: 'Error updating exhibition' });
+  }
+});
+
+// Delete exhibition
+app.delete('/api/admin/exhibitions/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const exhibitionId = req.params.id;
+    
+    const exhibition = await Exhibition.findByIdAndDelete(exhibitionId);
+    if (!exhibition) {
+      return res.status(404).json({ message: 'Exhibition not found' });
+    }
+    
+    res.json({ message: 'Exhibition deleted successfully' });
+  } catch (error) {
+    console.error('Delete exhibition error:', error);
+    res.status(500).json({ message: 'Error deleting exhibition' });
+  }
+});
+
+// Get all transactions
+app.get('/api/admin/transactions', authenticateAdmin, async (req, res) => {
+  try {
+    const transactions = await Ticket.find()
+      .populate('userId', 'name')
+      .sort({ createdAt: -1 });
+    
+    const formattedTransactions = transactions.map(t => ({
+      _id: t._id,
+      userId: t.userId?._id || 'Unknown User',
+      userName: t.userId?.name || 'Deleted User',
+      visitDate: t.visitDate,
+      tickets: t.tickets,
+      totalPrice: t.totalPrice,
+      status: t.status,
+      createdAt: t.createdAt,
+    }));
+    
+    res.json({ transactions: formattedTransactions });
+  } catch (error) {
+    console.error('Get transactions error:', error);
+    res.status(500).json({ message: 'Error retrieving transactions' });
+  }
+});
+
+// Public endpoint to get active exhibitions
+app.get('/api/exhibitions', async (req, res) => {
+  try {
+    // Only return active exhibitions that haven't ended yet
+    const currentDate = new Date();
+    const exhibitions = await Exhibition.find({
+      status: 'active',
+      endDate: { $gte: currentDate }
+    }).sort({ startDate: 1 });
+    
+    res.json({ exhibitions });
+  } catch (error) {
+    console.error('Get public exhibitions error:', error);
+    res.status(500).json({ message: 'Error retrieving exhibitions' });
+  }
+});
+
+// Get analytics
+app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
+  try {
+    const [
+      totalUsers,
+      totalTransactions,
+      activeExhibitions,
+      recentTransactions,
+      popularExhibitions
+    ] = await Promise.all([
+      User.countDocuments(),
+      Ticket.countDocuments(),
+      Exhibition.countDocuments({ status: 'active' }),
+      Ticket.find()
+        .populate('userId', 'name')
+        .sort({ createdAt: -1 })
+        .limit(5),
+      Ticket.aggregate([
+        { $unwind: '$tickets' },
+        { $match: { 'tickets.isExhibition': true } },
+        {
+          $group: {
+            _id: '$tickets.ticketId',
+            name: { $first: '$tickets.name' },
+            ticketCount: { $sum: '$tickets.quantity' },
+            revenue: { $sum: { $multiply: ['$tickets.price', '$tickets.quantity'] } }
+          }
+        },
+        { $sort: { ticketCount: -1 } },
+        { $limit: 5 }
+      ])
+    ]);
+
+    const totalRevenue = await Ticket.aggregate([
+      { $match: { status: 'confirmed' } },
+      { $group: { _id: null, total: { $sum: '$totalPrice' } } }
+    ]);
+
+    res.json({
+      totalUsers,
+      totalTransactions,
+      totalRevenue: totalRevenue[0]?.total || 0,
+      activeExhibitions,
+      recentTransactions: recentTransactions.map(t => ({
+        _id: t._id,
+        userId: t.userId?._id || 'Unknown User',
+        userName: t.userId?.name || 'Deleted User',
+        visitDate: t.visitDate,
+        tickets: t.tickets,
+        totalPrice: t.totalPrice,
+        status: t.status,
+        createdAt: t.createdAt,
+      })),
+      popularExhibitions
+    });
+  } catch (error) {
+    console.error('Get analytics error:', error);
+    res.status(500).json({ message: 'Error retrieving analytics' });
   }
 });
 

@@ -19,6 +19,7 @@ import PaymentPage from "./pages/PaymentPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
                   <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/" element={<Layout />}>
                       <Route index element={<Home />} />
                       <Route path="tickets" element={<Tickets />} />

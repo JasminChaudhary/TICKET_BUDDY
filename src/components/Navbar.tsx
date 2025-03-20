@@ -79,17 +79,32 @@ const Navbar: React.FC = () => {
                 About
               </Link>
               {user && (
-                <Link
-                  to="/dashboard"
-                  className={cn(
-                    "inline-flex items-center px-1 pt-1 text-sm font-medium",
-                    location.pathname === '/dashboard'
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-foreground hover:text-primary"
+                <>
+                  <Link
+                    to="/dashboard"
+                    className={cn(
+                      "inline-flex items-center px-1 pt-1 text-sm font-medium",
+                      location.pathname === '/dashboard'
+                        ? "text-primary border-b-2 border-primary"
+                        : "text-foreground hover:text-primary"
+                    )}
+                  >
+                    My Tickets
+                  </Link>
+                  {user.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      className={cn(
+                        "inline-flex items-center px-1 pt-1 text-sm font-medium",
+                        location.pathname === '/admin'
+                          ? "text-primary border-b-2 border-primary"
+                          : "text-foreground hover:text-primary"
+                      )}
+                    >
+                      Admin Panel
+                    </Link>
                   )}
-                >
-                  My Tickets
-                </Link>
+                </>
               )}
             </div>
           </div>
@@ -148,6 +163,14 @@ const Navbar: React.FC = () => {
                   >
                     My Dashboard
                   </DropdownMenuItem>
+                  {user.role === 'admin' && (
+                    <DropdownMenuItem 
+                      className="text-sm"
+                      onClick={() => navigate('/admin')}
+                    >
+                      Admin Panel
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     className="text-sm text-red-600"
                     onClick={() => logout()}
@@ -221,17 +244,32 @@ const Navbar: React.FC = () => {
               About
             </Link>
             {user ? (
-              <Link
-                to="/dashboard"
-                className={cn(
-                  "block pl-3 pr-4 py-2 text-base font-medium",
-                  location.pathname === '/dashboard'
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground hover:text-primary hover:bg-primary/5"
+              <>
+                <Link
+                  to="/dashboard"
+                  className={cn(
+                    "block pl-3 pr-4 py-2 text-base font-medium",
+                    location.pathname === '/dashboard'
+                      ? "text-primary bg-primary/10"
+                      : "text-foreground hover:text-primary hover:bg-primary/5"
+                  )}
+                >
+                  My Tickets
+                </Link>
+                {user.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className={cn(
+                      "block pl-3 pr-4 py-2 text-base font-medium",
+                      location.pathname === '/admin'
+                        ? "text-primary bg-primary/10"
+                        : "text-foreground hover:text-primary hover:bg-primary/5"
+                    )}
+                  >
+                    Admin Panel
+                  </Link>
                 )}
-              >
-                My Tickets
-              </Link>
+              </>
             ) : (
               <>
                 <Link

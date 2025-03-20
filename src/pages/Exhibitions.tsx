@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -9,8 +8,22 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Share2, Ticket } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import axios from 'axios';
 
-// Exhibition interface
+// Backend Exhibition interface
+interface ApiExhibition {
+  _id: string;
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  price: number;
+  imageUrl: string;
+  status: 'active' | 'inactive';
+  createdAt: string;
+}
+
+// Frontend Exhibition display interface
 interface Exhibition {
   id: string;
   title: string;
@@ -20,19 +33,82 @@ interface Exhibition {
   category: 'current' | 'upcoming' | 'past';
   duration: string;
   location: string;
+  price: number;
 }
 
-const Exhibitions: React.FC = () => {
+const Exhibitions = () => {
   const { t } = useLanguage();
   const [loaded, setLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState('current');
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    setLoaded(true);
+    const fetchExhibitions = async () => {
+      try {
+        const response = await axios.get('/api/exhibitions');
+        const apiExhibitions: ApiExhibition[] = response.data.exhibitions;
+        
+        // Transform API data to match our display format
+        const transformedExhibitions = apiExhibitions.map((exhibition: ApiExhibition) => {
+          const today = new Date();
+          const startDate = new Date(exhibition.startDate);
+          const endDate = new Date(exhibition.endDate);
+          
+          let category: 'current' | 'upcoming' | 'past';
+          if (today > endDate) {
+            category = 'past';
+          } else if (today >= startDate && today <= endDate) {
+            category = 'current';
+          } else {
+            category = 'upcoming';
+          }
+          
+          // Format dates for display: "Month DD - Month DD, YYYY"
+          const formatDate = (start: Date, end: Date) => {
+            const startMonth = start.toLocaleString('default', { month: 'long' });
+            const endMonth = end.toLocaleString('default', { month: 'long' });
+            const startDay = start.getDate();
+            const endDay = end.getDate();
+            const endYear = end.getFullYear();
+            
+            if (startMonth === endMonth) {
+              return `${startMonth} ${startDay} - ${endDay}, ${endYear}`;
+            } else {
+              return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${endYear}`;
+            }
+          };
+          
+          return {
+            id: exhibition._id,
+            title: exhibition.name,
+            description: exhibition.description,
+            date: formatDate(startDate, endDate),
+            image: exhibition.imageUrl,
+            category: category,
+            duration: '9:00 AM - 5:00 PM',  // Default hours
+            location: 'Main Exhibition Hall',  // Default location
+            price: exhibition.price
+          };
+        });
+        
+        setExhibitions(transformedExhibitions);
+        setLoading(false);
+        setLoaded(true);
+      } catch (error) {
+        console.error('Error fetching exhibitions:', error);
+        setLoading(false);
+        // Fall back to mock data if API fails
+        setExhibitions(mockExhibitions);
+        setLoaded(true);
+      }
+    };
+    
+    fetchExhibitions();
   }, []);
   
-  // Mock exhibitions data
-  const exhibitions: Exhibition[] = [
+  // Mock exhibitions data as fallback
+  const mockExhibitions: Exhibition[] = [
     {
       id: 'modern-masters',
       title: 'Modern Masterpieces',
@@ -42,6 +118,7 @@ const Exhibitions: React.FC = () => {
       category: 'current',
       duration: '9:00 AM - 6:00 PM',
       location: 'East Wing, Floor 2',
+      price: 15
     },
     {
       id: 'ancient-civilizations',
@@ -52,6 +129,7 @@ const Exhibitions: React.FC = () => {
       category: 'current',
       duration: '10:00 AM - 5:00 PM',
       location: 'North Wing, Floor 1',
+      price: 12
     },
     {
       id: 'natural-wonders',
@@ -62,6 +140,7 @@ const Exhibitions: React.FC = () => {
       category: 'current',
       duration: '9:00 AM - 7:00 PM',
       location: 'West Wing, Floor 3',
+      price: 10
     },
     {
       id: 'digital-revolution',
@@ -72,6 +151,7 @@ const Exhibitions: React.FC = () => {
       category: 'upcoming',
       duration: '10:00 AM - 8:00 PM',
       location: 'South Wing, Floor 2',
+      price: 18
     },
     {
       id: 'indigenous-cultures',
@@ -82,6 +162,7 @@ const Exhibitions: React.FC = () => {
       category: 'upcoming',
       duration: '9:00 AM - 6:00 PM',
       location: 'East Wing, Floor 1',
+      price: 14
     },
     {
       id: 'renaissance-masters',
@@ -92,6 +173,7 @@ const Exhibitions: React.FC = () => {
       category: 'past',
       duration: '10:00 AM - 5:00 PM',
       location: 'North Wing, Floor 2',
+      price: 15
     },
     {
       id: 'abstract-expressions',
@@ -102,6 +184,7 @@ const Exhibitions: React.FC = () => {
       category: 'past',
       duration: '9:00 AM - 6:00 PM',
       location: 'West Wing, Floor 1',
+      price: 12
     },
   ];
   
@@ -150,50 +233,76 @@ const Exhibitions: React.FC = () => {
             </TabsList>
           </div>
           
-          {/* Current Exhibitions */}
-          <TabsContent value="current" className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {currentExhibitions.map((exhibition, index) => (
-                <ExhibitionCard 
-                  key={exhibition.id} 
-                  exhibition={exhibition} 
-                  onShare={handleShare}
-                  isLoaded={loaded}
-                  index={index}
-                />
-              ))}
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-700"></div>
             </div>
-          </TabsContent>
-          
-          {/* Upcoming Exhibitions */}
-          <TabsContent value="upcoming" className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {upcomingExhibitions.map((exhibition, index) => (
-                <ExhibitionCard 
-                  key={exhibition.id} 
-                  exhibition={exhibition} 
-                  onShare={handleShare}
-                  isLoaded={loaded}
-                  index={index}
-                />
-              ))}
-            </div>
-          </TabsContent>
-          
-          {/* Past Exhibitions */}
-          <TabsContent value="past" className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {pastExhibitions.map((exhibition, index) => (
-                <ExhibitionCard 
-                  key={exhibition.id} 
-                  exhibition={exhibition} 
-                  onShare={handleShare}
-                  isLoaded={loaded}
-                  index={index}
-                />
-              ))}
-            </div>
-          </TabsContent>
+          ) : (
+            <>
+              {/* Current Exhibitions */}
+              <TabsContent value="current" className="space-y-8">
+                {currentExhibitions.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {currentExhibitions.map((exhibition, index) => (
+                      <ExhibitionCard 
+                        key={exhibition.id} 
+                        exhibition={exhibition} 
+                        onShare={handleShare}
+                        isLoaded={loaded}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-museum-500">No current exhibitions available.</p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              {/* Upcoming Exhibitions */}
+              <TabsContent value="upcoming" className="space-y-8">
+                {upcomingExhibitions.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {upcomingExhibitions.map((exhibition, index) => (
+                      <ExhibitionCard 
+                        key={exhibition.id} 
+                        exhibition={exhibition} 
+                        onShare={handleShare}
+                        isLoaded={loaded}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-museum-500">No upcoming exhibitions yet.</p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              {/* Past Exhibitions */}
+              <TabsContent value="past" className="space-y-8">
+                {pastExhibitions.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {pastExhibitions.map((exhibition, index) => (
+                      <ExhibitionCard 
+                        key={exhibition.id} 
+                        exhibition={exhibition} 
+                        onShare={handleShare}
+                        isLoaded={loaded}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-museum-500">No past exhibitions to display.</p>
+                  </div>
+                )}
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </div>
     </div>
@@ -262,6 +371,14 @@ const ExhibitionCard: React.FC<{
               <circle cx="12" cy="10" r="3" />
             </svg>
             <span className="text-museum-700 dark:text-museum-300">{exhibition.location}</span>
+          </div>
+          <div className="flex items-start gap-2 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-museum-500 dark:text-museum-400 mt-0.5">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span className="text-museum-700 dark:text-museum-300">${exhibition.price}</span>
           </div>
         </div>
       </CardContent>
