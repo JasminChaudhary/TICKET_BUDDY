@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,74 +26,6 @@ const About: React.FC = () => {
     setLoaded(true);
   }, []);
   
-  // FAQ data
-  const faqs = [
-    {
-      question: 'What are your opening hours?',
-      answer: 'Our museum is open Tuesday to Sunday from 10:00 AM to 6:00 PM. We are closed on Mondays and major holidays. Last admission is at 5:00 PM.',
-    },
-    {
-      question: 'How much do tickets cost?',
-      answer: 'Adult tickets are $20, Seniors (65+) are $15, Students are $12, and Children (6-17) are $10. Children under 6 are free. We also offer family passes for $50 (2 adults and up to 3 children).',
-    },
-    {
-      question: 'Do you offer guided tours?',
-      answer: 'Yes, we offer guided tours at 11:00 AM, 1:00 PM, and 3:00 PM daily. Tours last approximately 90 minutes and are included with your admission. Audio guides are also available in multiple languages for a small fee.',
-    },
-    {
-      question: 'Is the museum accessible for visitors with disabilities?',
-      answer: 'Yes, our museum is fully accessible for visitors with disabilities. We offer wheelchair ramps, elevators, accessible restrooms, and assistive listening devices. Service animals are welcome.',
-    },
-    {
-      question: 'What facilities do you have?',
-      answer: 'Our museum features a café, gift shop, coat check, free Wi-Fi, and restrooms on every floor. All facilities are accessible for visitors with disabilities.',
-    },
-    {
-      question: 'Can I take photographs in the museum?',
-      answer: 'Photography for personal use is permitted in most permanent collection galleries, but flash photography, tripods, and selfie sticks are not allowed. Photography is not permitted in some special exhibitions or where specifically prohibited.',
-    },
-    {
-      question: 'Do you offer membership?',
-      answer: 'Yes, we offer annual memberships starting at $75 for individuals. Members enjoy unlimited free admission, special exhibition discounts, invitations to exclusive events, and discounts at our café and gift shop.',
-    },
-    {
-      question: 'Can I book tickets online?',
-      answer: 'Yes, you can book tickets online through our website or via our chatbot assistant. Online booking is recommended to avoid queues, especially during peak times and for special exhibitions.',
-    },
-  ];
-  
-  // Team members data
-  const teamMembers = [
-    {
-      id: 1,
-      name: 'Dr. Sarah Johnson',
-      role: 'Museum Director',
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961',
-      description: 'Art historian with over 20 years of experience in museum curation and management.',
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      role: 'Chief Curator',
-      image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=2048',
-      description: 'Specialist in modern and contemporary art with a focus on intercultural dialogues.',
-    },
-    {
-      id: 3,
-      name: 'Elena Rodriguez',
-      role: 'Education Director',
-      image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1974',
-      description: 'Develops innovative educational programs to engage visitors of all ages.',
-    },
-    {
-      id: 4,
-      name: 'David Williams',
-      role: 'Technology Director',
-      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1974',
-      description: 'Leads digital initiatives to enhance visitor experience and engagement.',
-    },
-  ];
-  
   return (
     <div className="container max-w-6xl py-20">
       <div className="space-y-12">
@@ -117,12 +48,6 @@ const About: React.FC = () => {
               </TabsTrigger>
               <TabsTrigger value="visit" className="data-[state=active]:bg-accent-700 data-[state=active]:text-white">
                 Visit
-              </TabsTrigger>
-              <TabsTrigger value="team" className="data-[state=active]:bg-accent-700 data-[state=active]:text-white">
-                Our Team
-              </TabsTrigger>
-              <TabsTrigger value="faq" className="data-[state=active]:bg-accent-700 data-[state=active]:text-white">
-                FAQ
               </TabsTrigger>
             </TabsList>
           </div>
@@ -319,15 +244,15 @@ const About: React.FC = () => {
                         <dl className="space-y-1.5 text-sm">
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">General Inquiries</dt>
-                            <dd className="text-museum-900 dark:text-white">+1 (555) 123-4567</dd>
+                            <dd className="text-museum-900 dark:text-white">+91 9313023069</dd>
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">Membership</dt>
-                            <dd className="text-museum-900 dark:text-white">+1 (555) 123-4568</dd>
+                            <dd className="text-museum-900 dark:text-white">+91 9104800589</dd>
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">Group Tours</dt>
-                            <dd className="text-museum-900 dark:text-white">+1 (555) 123-4569</dd>
+                            <dd className="text-museum-900 dark:text-white">+91 9104800589</dd>
                           </div>
                         </dl>
                       </div>
@@ -344,15 +269,15 @@ const About: React.FC = () => {
                         <dl className="space-y-1.5 text-sm">
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">General</dt>
-                            <dd className="text-museum-900 dark:text-white">info@artmuseo.com</dd>
+                            <dd className="text-museum-900 dark:text-white">chaudharyjasmin645@gmail.com</dd>
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">Events</dt>
-                            <dd className="text-museum-900 dark:text-white">events@artmuseo.com</dd>
+                            <dd className="text-museum-900 dark:text-white">anshulavaiya@gmail.com</dd>
                           </div>
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">Education</dt>
-                            <dd className="text-museum-900 dark:text-white">education@artmuseo.com</dd>
+                            <dd className="text-museum-900 dark:text-white">chaudharyjasmin645@gmail.com</dd>
                           </div>
                         </dl>
                       </div>
@@ -486,108 +411,36 @@ const About: React.FC = () => {
             </div>
           </TabsContent>
           
-          {/* Team Tab */}
-          <TabsContent value="team" className="space-y-8">
-            <div className={cn("text-center mb-8", loaded && "animate-fade-in")}>
-              <h2 className="text-2xl font-display font-bold text-museum-900 dark:text-white mb-4">
-                Meet Our Team
-              </h2>
-              <p className="text-museum-600 dark:text-museum-300 max-w-2xl mx-auto">
-                Our dedicated team of professionals works tirelessly to create exceptional experiences for our visitors.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {teamMembers.map((member, index) => (
-                <div 
-                  key={member.id} 
-                  className={cn(
-                    "rounded-xl overflow-hidden bg-white dark:bg-museum-800 border border-museum-200 dark:border-museum-700 shadow-sm transition-all duration-300 hover-scale",
-                    loaded && "animate-scale-in"
-                  )}
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <div className="aspect-square overflow-hidden">
-                    <img 
-                      src={member.image} 
-                      alt={member.name} 
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-4 text-center">
-                    <h3 className="font-medium text-lg text-museum-900 dark:text-white">{member.name}</h3>
-                    <p className="text-accent-700 dark:text-accent-400 text-sm mb-2">{member.role}</p>
-                    <p className="text-museum-600 dark:text-museum-400 text-sm">{member.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className={cn(
-              "mt-8 p-8 bg-museum-50 dark:bg-museum-800 rounded-xl border border-museum-100 dark:border-museum-700 text-center",
-              loaded && "animate-fade-in"
-            )}>
-              <h3 className="text-xl font-medium text-museum-900 dark:text-white mb-4">Join Our Team</h3>
-              <p className="text-museum-600 dark:text-museum-400 mb-6 max-w-2xl mx-auto">
-                We're always looking for passionate, creative individuals to join our team. Check out our current openings or submit your resume for future opportunities.
-              </p>
-              <Button variant="outline" className="border-accent-200 dark:border-accent-800 text-accent-700 dark:text-accent-400 hover:bg-accent-50 dark:hover:bg-accent-900/20">
-                View Career Opportunities
+          {/* Still Have Questions section */}
+          <div className={cn(
+            "mt-8 p-8 bg-accent-50 dark:bg-accent-900/20 rounded-xl border border-accent-100 dark:border-accent-800 text-center",
+            loaded && "animate-fade-in"
+          )}>
+            <h3 className="text-xl font-medium text-museum-900 dark:text-white mb-4">Still Have Questions?</h3>
+            <p className="text-museum-600 dark:text-museum-400 mb-6 max-w-2xl mx-auto">
+              If you couldn't find the answer to your question, please feel free to contact us directly or chat with our virtual assistant.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button 
+                variant="outline" 
+                className="border-accent-200 dark:border-accent-800 text-accent-700 dark:text-accent-400 hover:bg-accent-50 dark:hover:bg-accent-900/20"
+                onClick={() => window.location.href = "mailto:chaudharyjasmin645@gmail.com"}
+              >
+                Contact Us
+              </Button>
+              <Button 
+                className="bg-accent-700 hover:bg-accent-800 text-white"
+                onClick={() => {
+                  const chatButton = document.querySelector('button[aria-label="Toggle chatbot"]');
+                  if (chatButton) {
+                    chatButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                  }
+                }}
+              >
+                Chat with Assistant
               </Button>
             </div>
-          </TabsContent>
-          
-          {/* FAQ Tab */}
-          <TabsContent value="faq" className="space-y-8">
-            <div className={cn("text-center mb-8", loaded && "animate-fade-in")}>
-              <h2 className="text-2xl font-display font-bold text-museum-900 dark:text-white mb-4">
-                Frequently Asked Questions
-              </h2>
-              <p className="text-museum-600 dark:text-museum-300 max-w-2xl mx-auto">
-                Find answers to commonly asked questions about visiting our museum.
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <div 
-                  key={index} 
-                  className={cn(
-                    "p-5 rounded-lg bg-white dark:bg-museum-800 border border-museum-200 dark:border-museum-700 shadow-sm transition-all duration-300",
-                    loaded && "animate-scale-in"
-                  )}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <h3 className="font-medium text-lg text-museum-900 dark:text-white mb-2">{faq.question}</h3>
-                  <p className="text-museum-600 dark:text-museum-400 text-sm">{faq.answer}</p>
-                </div>
-              ))}
-            </div>
-            
-            <div className={cn(
-              "mt-8 p-8 bg-accent-50 dark:bg-accent-900/20 rounded-xl border border-accent-100 dark:border-accent-800 text-center",
-              loaded && "animate-fade-in"
-            )}>
-              <h3 className="text-xl font-medium text-museum-900 dark:text-white mb-4">Still Have Questions?</h3>
-              <p className="text-museum-600 dark:text-museum-400 mb-6 max-w-2xl mx-auto">
-                If you couldn't find the answer to your question, please feel free to contact us directly or chat with our virtual assistant.
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button 
-                  variant="outline" 
-                  className="border-accent-200 dark:border-accent-800 text-accent-700 dark:text-accent-400 hover:bg-accent-50 dark:hover:bg-accent-900/20"
-                >
-                  Contact Us
-                </Button>
-                <Button 
-                  className="bg-accent-700 hover:bg-accent-800 text-white"
-                  onClick={() => document.querySelector('.fixed button')?.dispatchEvent(new MouseEvent('click'))}
-                >
-                  Chat with Assistant
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>

@@ -119,13 +119,15 @@ const Footer: React.FC = () => {
               <li className="flex items-center space-x-3 text-sm">
                 <Phone className="h-5 w-5 text-accent-700 dark:text-accent-400 flex-shrink-0" />
                 <span className="text-museum-600 dark:text-museum-300">
-                  +1 (555) 123-4567
+                  +91 9313023069<br />
+                  +91 9104800589
                 </span>
               </li>
               <li className="flex items-center space-x-3 text-sm">
                 <Mail className="h-5 w-5 text-accent-700 dark:text-accent-400 flex-shrink-0" />
                 <span className="text-museum-600 dark:text-museum-300">
-                  info@artmuseo.com
+                  chaudharyjasmin645@gmail.com
+                  anshulavaiya@gmail.com
                 </span>
               </li>
             </ul>
