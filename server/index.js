@@ -271,6 +271,45 @@ app.get('/api/tickets', authenticate, async (req, res) => {
   }
 });
 
+// Cancel ticket endpoint
+app.put('/api/tickets/:id/cancel', authenticate, async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    console.log(`Cancelling ticket ${ticketId} for user ${req.user._id}`);
+    
+    // Find ticket and check if it belongs to the user
+    const ticket = await Ticket.findOne({ _id: ticketId, userId: req.user._id });
+    
+    if (!ticket) {
+      return res.status(404).json({ message: 'Ticket not found or not authorized' });
+    }
+    
+    // Check if the ticket is already cancelled
+    if (ticket.status === 'cancelled') {
+      return res.status(400).json({ message: 'Ticket is already cancelled' });
+    }
+    
+    // Check if the visit date is in the past
+    const now = new Date();
+    const visitDate = new Date(ticket.visitDate);
+    if (visitDate < now) {
+      return res.status(400).json({ message: 'Cannot cancel a past visit' });
+    }
+    
+    // Update the ticket status to cancelled
+    ticket.status = 'cancelled';
+    await ticket.save();
+    
+    res.json({ 
+      message: 'Ticket cancelled successfully',
+      ticket 
+    });
+  } catch (error) {
+    console.error('Cancel ticket error:', error);
+    res.status(500).json({ message: 'Error cancelling ticket' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

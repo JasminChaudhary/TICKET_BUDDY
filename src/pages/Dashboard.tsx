@@ -37,6 +37,7 @@ const Dashboard: React.FC = () => {
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
+  const [isCancelling, setIsCancelling] = useState<string | null>(null);
 
   useEffect(() => {
     // Load user bookings immediately without checking auth first
@@ -102,6 +103,51 @@ const Dashboard: React.FC = () => {
 
   const getCancelledBookings = () => {
     return bookings.filter(booking => booking.status === 'cancelled');
+  };
+
+  // Function to handle ticket cancellation
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      if (!token) {
+        toast({
+          title: 'Authentication required',
+          description: 'Please login to cancel tickets.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setIsCancelling(bookingId);
+      
+      const response = await axios.put(`/api/tickets/${bookingId}/cancel`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      // Update the local state to reflect the cancellation
+      setBookings(prevBookings => 
+        prevBookings.map(booking => 
+          booking._id === bookingId 
+            ? { ...booking, status: 'cancelled' as const } 
+            : booking
+        )
+      );
+      
+      toast({
+        title: 'Success',
+        description: 'Your ticket has been successfully cancelled.',
+      });
+    } catch (error: any) {
+      console.error('Error cancelling ticket:', error);
+      toast({
+        title: 'Failed to cancel ticket',
+        description: error.response?.data?.message || 'There was an error cancelling your ticket. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCancelling(null);
+    }
   };
 
   return (
@@ -216,9 +262,26 @@ const Dashboard: React.FC = () => {
                             <span className="text-museum-700 dark:text-museum-300 mr-2">Total:</span>
                             <span className="text-museum-900 dark:text-white">${booking.totalPrice.toFixed(2)}</span>
                           </div>
-                          <Button variant="outline" size="sm" className="text-xs">
-                            <Info className="h-3 w-3 mr-1" /> View Details
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="text-xs">
+                              <Info className="h-3 w-3 mr-1" /> View Details
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              size="sm" 
+                              className="text-xs"
+                              onClick={() => handleCancelBooking(booking._id)}
+                              disabled={isCancelling === booking._id}
+                            >
+                              {isCancelling === booking._id ? (
+                                <>
+                                  <span className="animate-spin mr-1">⏳</span> Cancelling...
+                                </>
+                              ) : (
+                                <>Cancel Booking</>
+                              )}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}
