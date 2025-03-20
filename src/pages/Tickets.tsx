@@ -63,6 +63,34 @@ const Tickets: React.FC = () => {
       return;
     }
     
+    // Check if at least one age category ticket is selected
+    const hasAgeCategoryTicket = ticketTypes
+      .filter(ticket => !ticket.isExhibition)
+      .some(ticket => (selectedTickets[ticket.id] || 0) > 0);
+    
+    // Check if at least one exhibition ticket is selected
+    const hasExhibitionTicket = ticketTypes
+      .filter(ticket => ticket.isExhibition)
+      .some(ticket => (selectedTickets[ticket.id] || 0) > 0);
+    
+    if (!hasAgeCategoryTicket) {
+      toast({
+        title: 'Missing required ticket',
+        description: 'Please select at least one general admission ticket (Adult, Child, Senior, or Student).',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    if (!hasExhibitionTicket) {
+      toast({
+        title: 'Missing exhibition ticket',
+        description: 'Please select at least one exhibition ticket to proceed.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     navigate('/summary');
   };
   

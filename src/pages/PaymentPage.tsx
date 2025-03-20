@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChatbot } from '@/contexts/ChatbotContext';
@@ -142,7 +141,7 @@ const PaymentPage: React.FC = () => {
                   {t('payment.success')}
                 </h3>
                 <p className="text-museum-600 dark:text-museum-400">
-                  Your tickets have been booked successfully. A confirmation email has been sent to your email address.
+                  Your tickets have been booked successfully. A confirmation email with your tickets has been sent to <span className="font-medium">{paymentInfo.email}</span>.
                 </p>
                 <div className="pt-4">
                   <Button 
@@ -231,6 +230,9 @@ const PaymentPage: React.FC = () => {
                       onChange={handleInputChange}
                       required
                     />
+                    <p className="text-sm text-museum-500 dark:text-museum-400 italic">
+                      Your tickets will be sent to this email address after purchase.
+                    </p>
                   </div>
                 </div>
                 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChatbot } from '@/contexts/ChatbotContext';
@@ -29,8 +28,28 @@ const TicketSummary: React.FC = () => {
         variant: 'destructive',
       });
       navigate('/tickets');
+      return;
     }
-  }, [selectedDate, selectedTickets, navigate]);
+    
+    // Check if at least one age category ticket is selected
+    const hasAgeCategoryTicket = ticketTypes
+      .filter(ticket => !ticket.isExhibition)
+      .some(ticket => (selectedTickets[ticket.id] || 0) > 0);
+    
+    // Check if at least one exhibition ticket is selected
+    const hasExhibitionTicket = ticketTypes
+      .filter(ticket => ticket.isExhibition)
+      .some(ticket => (selectedTickets[ticket.id] || 0) > 0);
+    
+    if (!hasAgeCategoryTicket || !hasExhibitionTicket) {
+      toast({
+        title: 'Invalid ticket selection',
+        description: 'Please select at least one general admission ticket AND one exhibition ticket.',
+        variant: 'destructive',
+      });
+      navigate('/tickets');
+    }
+  }, [selectedDate, selectedTickets, ticketTypes, navigate]);
   
   // Format date for display
   const formattedDate = selectedDate ? format(selectedDate, 'EEEE, MMMM d, yyyy') : '';

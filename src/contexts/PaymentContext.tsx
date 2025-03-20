@@ -103,7 +103,8 @@ export const PaymentProvider: React.FC<{ children: React.ReactNode }> = ({ child
             await axios.post('/api/tickets', {
               visitDate: selectedDate.toISOString(),
               tickets: ticketsToBook,
-              totalPrice
+              totalPrice,
+              email: paymentInfo.email
             }, {
               headers: {
                 Authorization: `Bearer ${token}`
@@ -113,7 +114,7 @@ export const PaymentProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setPaymentStatus('success');
             toast({
               title: 'Payment Successful!',
-              description: 'Your tickets have been booked successfully.',
+              description: 'Your tickets have been booked successfully and sent to your email.',
             });
             
             // Reset form and navigate to dashboard after a delay

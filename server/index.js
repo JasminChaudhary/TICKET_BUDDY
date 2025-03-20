@@ -8,6 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
+import nodemailer from 'nodemailer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,13 +52,92 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-// MongoDB Connection
+// Configure mongoose
 mongoose.connect('mongodb://localhost:27017/ticket-buddy', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.log(err));
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
+
+// Configure email transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    // Note: In production, use environment variables for these values
+    user: 'chaudharyjasmin645@gmail.com', // Replace with your email
+    pass: 'zcsf lmfr perd ltcl', // Replace with your app password
+  },
+});
+
+// Email sending utility function
+const sendTicketEmail = async (email, ticketData) => {
+  try {
+    const { _id, visitDate, tickets, totalPrice } = ticketData;
+    
+    // Format tickets for display in email
+    const ticketList = tickets.map(ticket => 
+      `${ticket.name} x ${ticket.quantity}: $${(ticket.price * ticket.quantity).toFixed(2)}`
+    ).join('\n- ');
+    
+    // Format the visit date
+    const formattedDate = new Date(visitDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    // Create the email content
+    const mailOptions = {
+      from: 'your-email@gmail.com', // Replace with your email
+      to: email,
+      subject: 'Your Ticket Buddy Museum Tickets',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <h1 style="color: #4a5568; text-align: center;">Ticket Buddy Museum</h1>
+          <div style="background-color: #f7fafc; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
+            <h2 style="color: #2d3748; margin-top: 0;">Booking Confirmation</h2>
+            <p style="color: #4a5568;">Thank you for booking with Ticket Buddy Museum. Your tickets are confirmed!</p>
+            <p style="color: #4a5568;"><strong>Booking ID:</strong> ${_id}</p>
+            <p style="color: #4a5568;"><strong>Visit Date:</strong> ${formattedDate}</p>
+          </div>
+          
+          <h3 style="color: #2d3748;">Your Tickets:</h3>
+          <ul style="color: #4a5568;">
+            <li>- ${ticketList}</li>
+          </ul>
+          
+          <div style="background-color: #ebf8ff; border-radius: 5px; padding: 15px; margin-top: 20px;">
+            <p style="color: #2b6cb0; margin: 0;"><strong>Total Paid:</strong> $${totalPrice.toFixed(2)}</p>
+          </div>
+          
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+            <h3 style="color: #2d3748;">Important Information:</h3>
+            <ul style="color: #4a5568;">
+              <li>Please arrive at least 15 minutes before your intended entry time.</li>
+              <li>Present this email (printed or on your phone) at the entrance.</li>
+              <li>Opening hours: Tuesday-Friday 10:00-18:00, Weekends 09:00-20:00, Public Holidays 10:00-16:00</li>
+              <li>Last admission is 1 hour before closing.</li>
+            </ul>
+          </div>
+          
+          <p style="color: #718096; text-align: center; margin-top: 30px;">
+            If you have any questions, please contact us at support@ticketbuddy.example.com
+          </p>
+        </div>
+      `
+    };
+    
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Ticket email sent:', info.messageId);
+    return true;
+  } catch (error) {
+    console.error('Error sending ticket email:', error);
+    return false;
+  }
+};
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -142,6 +222,9 @@ const ticketSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  email: {
+    type: String,
   },
 });
 
@@ -333,7 +416,7 @@ app.post('/api/login', async (req, res) => {
 // Book tickets endpoint
 app.post('/api/tickets', authenticate, async (req, res) => {
   try {
-    const { visitDate, tickets, totalPrice } = req.body;
+    const { visitDate, tickets, totalPrice, email } = req.body;
     console.log(`Booking tickets for user ${req.user._id}, visit date: ${visitDate}`);
 
     // Create new ticket booking
@@ -342,9 +425,15 @@ app.post('/api/tickets', authenticate, async (req, res) => {
       visitDate: new Date(visitDate),
       tickets,
       totalPrice,
+      email // Save the email in the ticket document
     });
 
     await newTicket.save();
+
+    // Send confirmation email if email is provided
+    if (email) {
+      await sendTicketEmail(email, newTicket);
+    }
 
     res.status(201).json({
       message: 'Tickets booked successfully',

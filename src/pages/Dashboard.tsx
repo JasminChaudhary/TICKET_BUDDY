@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { Ticket, CalendarDays, User, Info, ArrowRight } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -87,16 +87,28 @@ const Dashboard: React.FC = () => {
   // Function to group bookings by status
   const getUpcomingBookings = () => {
     const now = new Date();
+    // Set hours, minutes, seconds and milliseconds to 0 to compare just the date
+    now.setHours(0, 0, 0, 0);
+    
     return bookings.filter(booking => {
       const visitDate = new Date(booking.visitDate);
+      // Set hours, minutes, seconds and milliseconds to 0 to compare just the date
+      visitDate.setHours(0, 0, 0, 0);
+      // Use >= instead of > to include today's bookings in upcoming
       return visitDate >= now && booking.status === 'confirmed';
     });
   };
 
   const getPastBookings = () => {
     const now = new Date();
+    // Set hours, minutes, seconds and milliseconds to 0 to compare just the date
+    now.setHours(0, 0, 0, 0);
+    
     return bookings.filter(booking => {
       const visitDate = new Date(booking.visitDate);
+      // Set hours, minutes, seconds and milliseconds to 0 to compare just the date
+      visitDate.setHours(0, 0, 0, 0);
+      // Use < instead of <= to exclude today's bookings from past
       return visitDate < now && booking.status === 'confirmed';
     });
   };
@@ -236,7 +248,7 @@ const Dashboard: React.FC = () => {
                           </div>
                           <div className="flex items-center">
                             <span className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
-                              Confirmed
+                              {isSameDay(new Date(booking.visitDate), new Date()) ? 'Today' : 'Confirmed'}
                             </span>
                           </div>
                         </div>
