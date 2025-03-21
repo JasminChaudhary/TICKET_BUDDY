@@ -159,6 +159,38 @@ const translations: Translations = {
     zh: '发送',
     ja: '送信',
   },
+  'chatbot.openingHours': {
+    en: 'Opening Hours',
+    es: 'Horario de Apertura',
+    fr: 'Heures d\'Ouverture',
+    de: 'Öffnungszeiten',
+    zh: '开放时间',
+    ja: '開館時間',
+  },
+  'chatbot.bookToday': {
+    en: 'Book for today',
+    es: 'Reservar para hoy',
+    fr: 'Réserver pour aujourd\'hui',
+    de: 'Für heute buchen',
+    zh: '预订今日票',
+    ja: '今日予約する',
+  },
+  'chatbot.selectDate': {
+    en: 'Select another date',
+    es: 'Seleccionar otra fecha',
+    fr: 'Sélectionner une autre date',
+    de: 'Anderes Datum wählen',
+    zh: '选择其他日期',
+    ja: '別の日付を選択',
+  },
+  'chatbot.goToTickets': {
+    en: 'Go to tickets page',
+    es: 'Ir a la página de entradas',
+    fr: 'Aller à la page des billets',
+    de: 'Zur Ticket-Seite gehen',
+    zh: '前往购票页面',
+    ja: 'チケットページへ',
+  },
   // Tickets
   'tickets.title': {
     en: 'Book Your Tickets',
@@ -518,6 +550,17 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return savedLanguage || getBrowserLanguage();
   });
 
+  // Create a function to set language that also forces a re-render
+  const handleSetLanguage = (newLang: Language) => {
+    setLanguage(newLang);
+    // Force re-render of app on language change
+    localStorage.setItem('language', newLang);
+    // Add a small delay to ensure state updates properly
+    setTimeout(() => {
+      window.dispatchEvent(new Event('languageChanged'));
+    }, 50);
+  };
+
   // Save language preference to localStorage
   useEffect(() => {
     localStorage.setItem('language', language);
@@ -533,7 +576,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, availableLanguages }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t, availableLanguages }}>
       {children}
     </LanguageContext.Provider>
   );

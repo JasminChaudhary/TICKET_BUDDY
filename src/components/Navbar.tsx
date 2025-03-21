@@ -34,11 +34,25 @@ const Logo: React.FC = () => {
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { theme, setTheme, isDark } = useTheme();
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Force re-render when language changes
+  const [, forceUpdate] = useState({});
+  
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      forceUpdate({});
+    };
+    
+    window.addEventListener('languageChanged', handleLanguageChange);
+    return () => {
+      window.removeEventListener('languageChanged', handleLanguageChange);
+    };
+  }, []);
 
   // Handle scroll effect
   useEffect(() => {
@@ -72,7 +86,7 @@ const Navbar: React.FC = () => {
                     : "text-foreground hover:text-primary"
                 )}
               >
-                Tickets
+                {t('nav.tickets')}
               </Link>
               <Link
                 to="/exhibitions"
@@ -83,7 +97,7 @@ const Navbar: React.FC = () => {
                     : "text-foreground hover:text-primary"
                 )}
               >
-                Exhibitions
+                {t('nav.exhibitions')}
               </Link>
               <Link
                 to="/about"
@@ -94,7 +108,7 @@ const Navbar: React.FC = () => {
                     : "text-foreground hover:text-primary"
                 )}
               >
-                About
+                {t('nav.about')}
               </Link>
               {user && (
                 <>
@@ -107,7 +121,7 @@ const Navbar: React.FC = () => {
                         : "text-foreground hover:text-primary"
                     )}
                   >
-                    My Tickets
+                    {t('nav.myTickets')}
                   </Link>
                   {user.role === 'admin' && (
                     <Link
@@ -119,7 +133,7 @@ const Navbar: React.FC = () => {
                           : "text-foreground hover:text-primary"
                       )}
                     >
-                      Admin Panel
+                      {t('nav.adminPanel')}
                     </Link>
                   )}
                 </>
@@ -186,31 +200,31 @@ const Navbar: React.FC = () => {
                     className="text-sm"
                     onClick={() => navigate('/dashboard')}
                   >
-                    My Dashboard
+                    {t('nav.myDashboard')}
                   </DropdownMenuItem>
                   {user.role === 'admin' && (
                     <DropdownMenuItem 
                       className="text-sm"
                       onClick={() => navigate('/admin')}
                     >
-                      Admin Panel
+                      {t('nav.adminPanel')}
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem
                     className="text-sm text-red-600"
                     onClick={() => logout()}
                   >
-                    Logout
+                    {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <div className="flex space-x-2">
                 <Link to="/login">
-                  <Button variant="ghost">Login</Button>
+                  <Button variant="ghost">{t('nav.login')}</Button>
                 </Link>
                 <Link to="/signup">
-                  <Button>Sign up</Button>
+                  <Button>{t('nav.signup')}</Button>
                 </Link>
               </div>
             )}
@@ -244,7 +258,7 @@ const Navbar: React.FC = () => {
                   : "text-foreground hover:text-primary hover:bg-primary/5"
               )}
             >
-              Tickets
+              {t('nav.tickets')}
             </Link>
             <Link
               to="/exhibitions"
@@ -255,7 +269,7 @@ const Navbar: React.FC = () => {
                   : "text-foreground hover:text-primary hover:bg-primary/5"
               )}
             >
-              Exhibitions
+              {t('nav.exhibitions')}
             </Link>
             <Link
               to="/about"
@@ -266,7 +280,7 @@ const Navbar: React.FC = () => {
                   : "text-foreground hover:text-primary hover:bg-primary/5"
               )}
             >
-              About
+              {t('nav.about')}
             </Link>
             {user ? (
               <>
@@ -279,7 +293,7 @@ const Navbar: React.FC = () => {
                       : "text-foreground hover:text-primary hover:bg-primary/5"
                   )}
                 >
-                  My Tickets
+                  {t('nav.myTickets')}
                 </Link>
                 {user.role === 'admin' && (
                   <Link
@@ -291,7 +305,7 @@ const Navbar: React.FC = () => {
                         : "text-foreground hover:text-primary hover:bg-primary/5"
                     )}
                   >
-                    Admin Panel
+                    {t('nav.adminPanel')}
                   </Link>
                 )}
               </>
@@ -301,13 +315,13 @@ const Navbar: React.FC = () => {
                   to="/login"
                   className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5"
                 >
-                  Login
+                  {t('nav.login')}
                 </Link>
                 <Link
                   to="/signup"
                   className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5"
                 >
-                  Sign up
+                  {t('nav.signup')}
                 </Link>
               </>
             )}

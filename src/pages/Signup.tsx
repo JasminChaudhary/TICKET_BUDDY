@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import axios from 'axios';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -27,16 +26,7 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      // Make API call to backend
-      const response = await axios.post('/api/signup', {
-        name,
-        email,
-        password,
-      });
-
-      // Update auth context with user data
-      await signup(response.data.user, response.data.token);
-      
+      await signup(name, email, password);
       toast.success('Account created successfully!');
       navigate('/');
     } catch (error: any) {

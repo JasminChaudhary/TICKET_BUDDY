@@ -88,25 +88,25 @@ const About: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-5 bg-museum-50 dark:bg-museum-800 rounded-lg border border-museum-100 dark:border-museum-700 flex flex-col items-center text-center">
                     <Landmark className="h-8 w-8 text-accent-700 dark:text-accent-400 mb-3" />
-                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">Established</h3>
+                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">{t('about.established')}</h3>
                     <p className="text-museum-600 dark:text-museum-400 text-sm">1975</p>
                   </div>
                   
                   <div className="p-5 bg-museum-50 dark:bg-museum-800 rounded-lg border border-museum-100 dark:border-museum-700 flex flex-col items-center text-center">
                     <BookOpen className="h-8 w-8 text-accent-700 dark:text-accent-400 mb-3" />
-                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">Collection</h3>
+                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">{t('about.collection')}</h3>
                     <p className="text-museum-600 dark:text-museum-400 text-sm">25,000+ Items</p>
                   </div>
                   
                   <div className="p-5 bg-museum-50 dark:bg-museum-800 rounded-lg border border-museum-100 dark:border-museum-700 flex flex-col items-center text-center">
                     <Users className="h-8 w-8 text-accent-700 dark:text-accent-400 mb-3" />
-                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">Annual Visitors</h3>
+                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">{t('about.annualVisitors')}</h3>
                     <p className="text-museum-600 dark:text-museum-400 text-sm">500,000+</p>
                   </div>
                   
                   <div className="p-5 bg-museum-50 dark:bg-museum-800 rounded-lg border border-museum-100 dark:border-museum-700 flex flex-col items-center text-center">
                     <Award className="h-8 w-8 text-accent-700 dark:text-accent-400 mb-3" />
-                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">Awards</h3>
+                    <h3 className="font-medium text-museum-900 dark:text-white mb-1">{t('about.awards')}</h3>
                     <p className="text-museum-600 dark:text-museum-400 text-sm">15 National</p>
                   </div>
                 </div>
@@ -119,15 +119,15 @@ const About: React.FC = () => {
               loaded && "animate-fade-in"
             )}>
               <h3 className="text-xl font-display font-bold text-museum-900 dark:text-white mb-4">
-                Join Us in Our Journey
+                {t('about.joinUs')}
               </h3>
               <p className="text-museum-600 dark:text-museum-300 mb-6 max-w-2xl mx-auto">
-                Support our mission by becoming a member, volunteering, or making a donation. Your contribution helps us continue to provide exceptional art experiences and educational programs.
+                {t('about.supportText')}
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link to="/tickets">
                   <Button className="bg-accent-700 hover:bg-accent-800 text-white min-w-40">
-                    Book a Visit
+                    {t('about.bookVisit')}
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
@@ -147,7 +147,7 @@ const About: React.FC = () => {
                         <Clock className="h-5 w-5 text-accent-700 dark:text-accent-400" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-lg text-museum-900 dark:text-white mb-2">Opening Hours</h3>
+                        <h3 className="font-medium text-lg text-museum-900 dark:text-white mb-2">{t('chatbot.openingHours')}</h3>
                         <dl className="space-y-1 text-sm">
                           <div className="flex justify-between">
                             <dt className="text-museum-600 dark:text-museum-400">Monday</dt>
@@ -175,22 +175,22 @@ const About: React.FC = () => {
                     <Separator />
                     
                     <div>
-                      <h3 className="font-medium text-lg text-museum-900 dark:text-white mb-2">Admission Prices</h3>
+                      <h3 className="font-medium text-lg text-museum-900 dark:text-white mb-2">{t('tickets.price')}</h3>
                       <dl className="space-y-1.5 text-sm">
                         <div className="flex justify-between">
-                          <dt className="text-museum-600 dark:text-museum-400">Adult</dt>
+                          <dt className="text-museum-600 dark:text-museum-400">{t('tickets.adult')}</dt>
                           <dd className="text-museum-900 dark:text-white">$20.00</dd>
                         </div>
                         <div className="flex justify-between">
-                          <dt className="text-museum-600 dark:text-museum-400">Senior (65+)</dt>
+                          <dt className="text-museum-600 dark:text-museum-400">{t('tickets.senior')}</dt>
                           <dd className="text-museum-900 dark:text-white">$15.00</dd>
                         </div>
                         <div className="flex justify-between">
-                          <dt className="text-museum-600 dark:text-museum-400">Student (with ID)</dt>
+                          <dt className="text-museum-600 dark:text-museum-400">{t('tickets.student')}</dt>
                           <dd className="text-museum-900 dark:text-white">$12.00</dd>
                         </div>
                         <div className="flex justify-between">
-                          <dt className="text-museum-600 dark:text-museum-400">Child (6-17)</dt>
+                          <dt className="text-museum-600 dark:text-museum-400">{t('tickets.child')}</dt>
                           <dd className="text-museum-900 dark:text-white">$10.00</dd>
                         </div>
                         <div className="flex justify-between">
@@ -403,7 +403,7 @@ const About: React.FC = () => {
               <div className="text-center">
                 <Link to="/tickets">
                   <Button size="lg" className="bg-accent-700 hover:bg-accent-800 text-white">
-                    Book Your Visit
+                    {t('about.bookVisit')}
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>

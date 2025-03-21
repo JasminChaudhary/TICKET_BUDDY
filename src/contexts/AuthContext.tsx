@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
 
 const API_URL = '/api';
@@ -89,9 +89,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   // Call validateToken when the component mounts
-  if (token && !user) {
-    validateToken();
-  }
+  useEffect(() => {
+    if (token && !user) {
+      validateToken();
+    }
+  }, [token, user]);
 
   const isAuthenticated = () => !!token;
 

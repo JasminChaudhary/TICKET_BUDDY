@@ -181,12 +181,11 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
         options: [
           { text: t('tickets.title'), value: 'buy_tickets' },
           { text: t('nav.exhibitions'), value: 'exhibition_info' },
-          { text: 'Opening Hours', value: 'opening_hours' },
+          { text: t('chatbot.openingHours'), value: 'opening_hours' },
         ],
       };
       setMessages([welcomeMessage]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t]);
 
   // Update welcome message when language changes
@@ -198,12 +197,11 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
         options: [
           { text: t('tickets.title'), value: 'buy_tickets' },
           { text: t('nav.exhibitions'), value: 'exhibition_info' },
-          { text: 'Opening Hours', value: 'opening_hours' },
+          { text: t('chatbot.openingHours'), value: 'opening_hours' },
         ],
       };
       setMessages([updatedWelcomeMessage, ...messages.slice(1)]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language, t]);
 
   // Calculate total price when selected tickets change
@@ -460,7 +458,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
           options: [
             { text: t('tickets.title'), value: 'buy_tickets' },
             { text: t('nav.exhibitions'), value: 'exhibition_info' },
-            { text: 'Opening Hours', value: 'opening_hours' },
+            { text: t('chatbot.openingHours'), value: 'opening_hours' },
             { text: 'Museum Facilities', value: 'facilities' },
           ],
         };
@@ -591,8 +589,8 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
             content: `${faqMatch.answer}\n\nIs there anything else you'd like to know?`,
             timestamp: new Date(),
             options: [
-              { text: 'Book tickets', value: 'buy_tickets' },
-              { text: 'Exhibition information', value: 'exhibition_info' },
+              { text: t('tickets.title'), value: 'buy_tickets' },
+              { text: t('nav.exhibitions'), value: 'exhibition_info' },
             ],
           };
         }
@@ -605,7 +603,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
           options: [
             { text: t('tickets.title'), value: 'buy_tickets' },
             { text: t('nav.exhibitions'), value: 'exhibition_info' },
-            { text: 'Opening Hours', value: 'opening_hours' },
+            { text: t('chatbot.openingHours'), value: 'opening_hours' },
             { text: 'Museum Location', value: 'location' },
             { text: 'Help', value: 'help' },
           ],
@@ -618,21 +616,21 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
     switch (value) {
       case 'buy_tickets':
         addBotMessage('Great! Let me help you with ticket booking. Would you like to book tickets for today or select another date?', [
-          { text: 'Book for today', value: 'book_today' },
-          { text: 'Select another date', value: 'select_date' },
+          { text: t('chatbot.bookToday'), value: 'book_today' },
+          { text: t('chatbot.selectDate'), value: 'select_date' },
         ]);
         break;
       
       case 'book_today':
         setSelectedDate(new Date());
         addBotMessage('Perfect! How many tickets would you like to book?', [
-          { text: 'Go to tickets page', value: 'go_to_tickets' },
+          { text: t('chatbot.goToTickets'), value: 'go_to_tickets' },
         ]);
         break;
       
       case 'select_date':
         addBotMessage('You can select a date on our tickets page. Would you like to go there now?', [
-          { text: 'Go to tickets page', value: 'go_to_tickets' },
+          { text: t('chatbot.goToTickets'), value: 'go_to_tickets' },
         ]);
         break;
       
@@ -869,7 +867,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
       options: [
         { text: t('tickets.title'), value: 'buy_tickets' },
         { text: t('nav.exhibitions'), value: 'exhibition_info' },
-        { text: 'Opening Hours', value: 'opening_hours' },
+        { text: t('chatbot.openingHours'), value: 'opening_hours' },
       ],
     };
     setMessages([welcomeMessage]);

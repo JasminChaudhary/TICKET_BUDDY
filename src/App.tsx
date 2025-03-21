@@ -20,8 +20,28 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import { useEffect, useState } from "react";
 
 const queryClient = new QueryClient();
+
+// Create an AppWrapper to manage the language change effect
+const AppWrapper = () => {
+  const [key, setKey] = useState(0);
+  
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      // Force re-render the entire app when language changes
+      setKey(prevKey => prevKey + 1);
+    };
+    
+    window.addEventListener('languageChanged', handleLanguageChange);
+    return () => {
+      window.removeEventListener('languageChanged', handleLanguageChange);
+    };
+  }, []);
+  
+  return <App key={key} />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -59,4 +79,4 @@ const App = () => (
   </QueryClientProvider>
 );
 
-export default App;
+export default AppWrapper;

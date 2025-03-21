@@ -242,7 +242,7 @@ const ChatbotMessage: React.FC<{
               <button
                 key={option.value}
                 onClick={() => onOptionSelect(option.value)}
-                className="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-accent-900/20 text-accent-700 dark:text-accent-400 hover:bg-accent-100 dark:hover:bg-accent-900/30 transition-colors border-2 border-accent-200 dark:border-accent-800 shadow-sm"
+                className="text-xs px-3 py-1.5 rounded-full bg-accent-100 dark:bg-accent-800 text-black dark:text-white hover:bg-accent-200 dark:hover:bg-accent-700 transition-colors border-2 border-accent-300 dark:border-accent-700 shadow-sm font-medium"
               >
                 {option.text}
               </button>
