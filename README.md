@@ -81,3 +81,57 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 Jasmin Chaudhary - [GitHub](https://github.com/JasminChaudhary)
 
 Project Link: [https://github.com/JasminChaudhary/Ticket_Buddy](https://github.com/JasminChaudhary/Ticket_Buddy)
+
+## Deployment on Render
+
+### Backend Deployment
+
+1. **Create a new Web Service**
+   - Sign up or log in to [Render](https://render.com)
+   - Click "New +" and select "Web Service"
+   - Connect your GitHub/GitLab repository
+   - Configure:
+     - Name: `ticket-buddy-api`
+     - Environment: `Node`
+     - Build Command: `npm install`
+     - Start Command: `node server/index.js`
+
+2. **Environment Variables**
+   - Add the following under the "Environment" section:
+     - `PORT`: `8080` (Render assigned port)
+     - `MONGODB_URI`: Your MongoDB Atlas connection string
+     - `JWT_SECRET`: A secure random string
+     - `FRONTEND_URL`: `https://ticket-buddy.onrender.com`
+     - `EMAIL_USER`: Your email address
+     - `EMAIL_PASS`: Your email password/app password
+
+3. **Create MongoDB Atlas Database**
+   - Sign up for [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+   - Create a new cluster (free tier works)
+   - Set up database user with password
+   - Whitelist IP access (0.0.0.0/0 for Render)
+   - Get connection string and add to Render environment variables
+
+### Frontend Deployment
+
+1. **Create a new Static Site**
+   - In Render dashboard, click "New +" again
+   - Select "Static Site"
+   - Connect your repository
+   - Configure:
+     - Name: `ticket-buddy`
+     - Build Command: `npm install && npm run build`
+     - Publish Directory: `dist`
+
+2. **Environment Variables**
+   - Add:
+     - `VITE_API_URL`: `https://ticket-buddy-api.onrender.com`
+
+3. **Auto Deploy**
+   - Render will automatically deploy when you push to your main branch
+
+## Troubleshooting
+
+- If your uploads directory isn't being tracked by Git, ensure the `.gitkeep` file exists in it.
+- For email issues, make sure your Gmail account has "Less secure app access" enabled or use app passwords.
+- If the frontend can't connect to the backend, check CORS configuration in `server/index.js` and verify the API URL in frontend.

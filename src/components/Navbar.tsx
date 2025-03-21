@@ -134,11 +134,23 @@ const Navbar: React.FC = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLanguage('en')}>
+                <DropdownMenuItem onClick={() => setLanguage('en')} className={language === 'en' ? 'bg-accent/50' : ''}>
                   English
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('es')}>
+                <DropdownMenuItem onClick={() => setLanguage('es')} className={language === 'es' ? 'bg-accent/50' : ''}>
                   Español
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('fr')} className={language === 'fr' ? 'bg-accent/50' : ''}>
+                  Français
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('de')} className={language === 'de' ? 'bg-accent/50' : ''}>
+                  Deutsch
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('zh')} className={language === 'zh' ? 'bg-accent/50' : ''}>
+                  中文
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('ja')} className={language === 'ja' ? 'bg-accent/50' : ''}>
+                  日本語
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

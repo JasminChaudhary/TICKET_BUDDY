@@ -187,7 +187,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setMessages([welcomeMessage]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [t]);
 
   // Update welcome message when language changes
   useEffect(() => {
@@ -204,7 +204,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setMessages([updatedWelcomeMessage, ...messages.slice(1)]);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language]);
+  }, [language, t]);
 
   // Calculate total price when selected tickets change
   useEffect(() => {
@@ -480,7 +480,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
           };
         }
         // Fall through to default if no match
-        
+      
       case 'buy_tickets':
         return {
           id: responseId,
@@ -693,7 +693,7 @@ export const ChatbotProvider: React.FC<{ children: React.ReactNode }> = ({ child
             .join(' and ');
           
           addBotMessage(`We have exciting upcoming exhibitions including ${upcomingList}. Would you like to be notified when these open?`, [
-            { text: 'Notify me', value: 'exhibition_notify' },
+          { text: 'Notify me', value: 'exhibition_notify' },
             { text: 'More information', value: 'view_exhibitions' },
           ]);
         } else {

@@ -32,10 +32,10 @@ const About: React.FC = () => {
         {/* Page Title */}
         <div className="text-center animate-fade-in">
           <h1 className="font-display text-3xl md:text-4xl font-bold text-museum-900 dark:text-white mb-4">
-            About Our Museum
+            {t('about.pageTitle')}
           </h1>
           <p className="text-museum-600 dark:text-museum-300 max-w-2xl mx-auto">
-            Discover our story, mission, and the team that brings art and culture to life.
+            {t('about.pageSubtitle')}
           </p>
         </div>
         
@@ -44,10 +44,10 @@ const About: React.FC = () => {
           <div className="flex justify-center mb-8">
             <TabsList className="bg-museum-100 dark:bg-museum-800">
               <TabsTrigger value="about" className="data-[state=active]:bg-accent-700 data-[state=active]:text-white">
-                About Us
+                {t('about.aboutUsTab')}
               </TabsTrigger>
               <TabsTrigger value="visit" className="data-[state=active]:bg-accent-700 data-[state=active]:text-white">
-                Visit
+                {t('about.visitTab')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -58,19 +58,19 @@ const About: React.FC = () => {
               {/* Left Column */}
               <div className={cn("space-y-6", loaded && "animate-fade-in")}>
                 <div>
-                  <h2 className="text-2xl font-display font-bold text-museum-900 dark:text-white mb-4">Our Story</h2>
+                  <h2 className="text-2xl font-display font-bold text-museum-900 dark:text-white mb-4">{t('about.ourStory')}</h2>
                   <p className="text-museum-600 dark:text-museum-300 mb-4">
-                    Founded in 1975, our museum has grown from a small gallery to a world-renowned cultural institution. For over four decades, we've been dedicated to collecting, preserving, and exhibiting significant works of art and cultural artifacts from around the world.
+                    {t('about.storyText1')}
                   </p>
                   <p className="text-museum-600 dark:text-museum-300">
-                    Our collection spans thousands of years, from ancient civilizations to contemporary expressions, reflecting the diversity and richness of human creativity and cultural heritage.
+                    {t('about.storyText2')}
                   </p>
                 </div>
                 
                 <div>
-                  <h2 className="text-2xl font-display font-bold text-museum-900 dark:text-white mb-4">Our Mission</h2>
+                  <h2 className="text-2xl font-display font-bold text-museum-900 dark:text-white mb-4">{t('about.ourMission')}</h2>
                   <p className="text-museum-600 dark:text-museum-300">
-                    We are committed to making art and culture accessible to all, fostering understanding and appreciation across different cultures and time periods. Through our exhibitions, educational programs, and community outreach, we strive to inspire curiosity, creativity, and lifelong learning.
+                    {t('about.missionText')}
                   </p>
                 </div>
               </div>

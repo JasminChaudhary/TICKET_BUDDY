@@ -1,0 +1,33 @@
+services:
+  # Backend API Service
+  - type: web
+    name: ticket-buddy-api
+    env: node
+    region: ohio # Choose your region
+    buildCommand: npm install
+    startCommand: node server/index.js
+    plan: free # Upgrade as needed
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: MONGODB_URI
+        sync: false # Set this manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true # Auto-generates a secure random value
+      - key: FRONTEND_URL
+        value: https://ticket-buddy.onrender.com
+      - key: EMAIL_USER
+        sync: false # Set this manually
+      - key: EMAIL_PASS
+        sync: false # Set this manually
+
+  # Frontend Static Site
+  - type: static
+    name: ticket-buddy
+    env: static
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    plan: free # Upgrade as needed
+    envVars:
+      - key: VITE_API_URL
+        value: https://ticket-buddy-api.onrender.com 

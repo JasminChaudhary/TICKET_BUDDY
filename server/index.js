@@ -285,7 +285,7 @@ const authenticate = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     
     try {
-      const decoded = jwt.verify(token, 'your_jwt_secret');
+      const decoded = jwt.verify(token, 'your_secret_key_for_development');
       
       const user = await User.findById(decoded.userId);
       if (!user) {
@@ -327,7 +327,7 @@ const authenticateAdmin = async (req, res, next) => {
 };
 
 // Routes
-app.post('/api/signup', async (req, res) => {
+app.post('/api/auth/signup', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
@@ -354,7 +354,7 @@ app.post('/api/signup', async (req, res) => {
     // Create JWT token
     const token = jwt.sign(
       { userId: user._id },
-      'your_jwt_secret', // Replace with a secure secret key
+      'your_secret_key_for_development',
       { expiresIn: '24h' }
     );
 
@@ -362,7 +362,7 @@ app.post('/api/signup', async (req, res) => {
       message: 'User created successfully',
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -375,7 +375,7 @@ app.post('/api/signup', async (req, res) => {
 });
 
 // Login endpoint
-app.post('/api/login', async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -394,14 +394,14 @@ app.post('/api/login', async (req, res) => {
     // Create JWT token
     const token = jwt.sign(
       { userId: user._id },
-      'your_jwt_secret', // Replace with a secure secret key
+      'your_secret_key_for_development',
       { expiresIn: '24h' }
     );
 
     res.json({
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -410,6 +410,24 @@ app.post('/api/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Error logging in' });
+  }
+});
+
+// Token validation endpoint
+app.get('/api/auth/validate', authenticate, async (req, res) => {
+  try {
+    // If authenticate middleware passed, the user is authenticated
+    res.json({
+      user: {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+      }
+    });
+  } catch (error) {
+    console.error('Token validation error:', error);
+    res.status(500).json({ message: 'Error validating token' });
   }
 });
 
@@ -764,9 +782,6 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
   }
 });
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 // Image upload endpoint
 app.post('/api/upload', upload.single('image'), (req, res) => {
   try {
@@ -782,6 +797,9 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
     res.status(500).json({ error: 'Failed to upload file' });
   }
 });
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 3000;
 
