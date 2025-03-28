@@ -153,7 +153,7 @@ const exhibitionSchema = new mongoose.Schema({
 const Exhibition = mongoose.model('Exhibition', exhibitionSchema);
 
 // Configure mongoose
-mongoose.connect('mongodb://localhost:27017/ticket-buddy', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ticket-buddy', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -164,9 +164,8 @@ mongoose.connect('mongodb://localhost:27017/ticket-buddy', {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    // Note: In production, use environment variables for these values
-    user: 'chaudharyjasmin645@gmail.com', // Replace with your email
-    pass: 'zcsf lmfr perd ltcl', // Replace with your app password
+    user: process.env.EMAIL_USER || 'your-email@example.com', // Use env variable
+    pass: process.env.EMAIL_PASS || 'your-app-password', // Use env variable
   },
 });
 
@@ -190,7 +189,7 @@ const sendTicketEmail = async (email, ticketData) => {
     
     // Create the email content
     const mailOptions = {
-      from: 'chaudharyjasmin645@gmail.com', // Replace with your email
+      from: process.env.EMAIL_USER || 'your-email@example.com', // Use env variable
       to: email,
       subject: 'Your Ticket Buddy Museum Tickets',
       html: `
@@ -252,7 +251,7 @@ const authenticate = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     
     try {
-      const decoded = jwt.verify(token, 'your_secret_key_for_development');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_secret_key_for_development');
       
       const user = await User.findById(decoded.userId);
       if (!user) {
@@ -321,7 +320,7 @@ app.post('/api/auth/signup', async (req, res) => {
     // Create JWT token
     const token = jwt.sign(
       { userId: user._id },
-      'your_secret_key_for_development',
+      process.env.JWT_SECRET || 'your_secret_key_for_development',
       { expiresIn: '24h' }
     );
 
@@ -361,7 +360,7 @@ app.post('/api/auth/login', async (req, res) => {
     // Create JWT token
     const token = jwt.sign(
       { userId: user._id },
-      'your_secret_key_for_development',
+      process.env.JWT_SECRET || 'your_secret_key_for_development',
       { expiresIn: '24h' }
     );
 

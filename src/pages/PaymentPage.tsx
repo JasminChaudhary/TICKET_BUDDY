@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, CreditCard, Lock, Loader2, CheckCircle } from 'lucide-react';
+import { ChevronLeft, Lock, Loader2, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -20,13 +20,11 @@ const PaymentPage: React.FC = () => {
     paymentInfo, 
     setPaymentInfo, 
     paymentStatus, 
-    processPayment, 
     processRazorpayPayment, 
     paymentError 
   } = usePayment();
   
   const [isLoaded, setIsLoaded] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'razorpay'>('razorpay');
   
   // Load Razorpay script
   useEffect(() => {
@@ -41,10 +39,9 @@ const PaymentPage: React.FC = () => {
           resolve(false);
           toast({
             title: 'Razorpay Error',
-            description: 'Failed to load Razorpay. Please try another payment method.',
+            description: 'Failed to load Razorpay payment gateway. Please try again later.',
             variant: 'destructive',
           });
-          setPaymentMethod('card');
         };
         document.body.appendChild(script);
       });
@@ -68,56 +65,16 @@ const PaymentPage: React.FC = () => {
     }
   }, [selectedDate, selectedTickets, navigate]);
   
-  // Format card number with spaces for readability
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = (matches && matches[0]) || '';
-    const parts = [];
-    
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-    
-    if (parts.length) {
-      return parts.join(' ');
-    } else {
-      return value;
-    }
-  };
-  
-  // Format expiry date
-  const formatExpiryDate = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    
-    if (v.length >= 3) {
-      return `${v.substring(0, 2)}/${v.substring(2, 4)}`;
-    }
-    
-    return value;
-  };
-  
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    if (name === 'cardNumber') {
-      setPaymentInfo({ ...paymentInfo, [name]: formatCardNumber(value) });
-    } else if (name === 'expiryDate') {
-      setPaymentInfo({ ...paymentInfo, [name]: formatExpiryDate(value) });
-    } else {
-      setPaymentInfo({ ...paymentInfo, [name]: value });
-    }
+    setPaymentInfo({ ...paymentInfo, [name]: value });
   };
   
   // Handle payment submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (paymentMethod === 'razorpay') {
-      processRazorpayPayment();
-    } else {
-      processPayment();
-    }
+    processRazorpayPayment();
   };
   
   // Navigate back to summary
@@ -191,103 +148,16 @@ const PaymentPage: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                {/* Payment Method Selection */}
+                {/* Payment Method */}
                 <div className="mb-6">
                   <h3 className="font-medium text-museum-900 dark:text-white mb-3">Payment Method</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div
-                      className={cn(
-                        "border rounded-lg p-4 flex flex-col items-center gap-2 cursor-pointer transition-colors",
-                        paymentMethod === 'razorpay' 
-                          ? "border-accent-500 bg-accent-50 dark:bg-accent-900/20" 
-                          : "border-museum-200 dark:border-museum-700 hover:bg-museum-50 dark:hover:bg-museum-800"
-                      )}
-                      onClick={() => setPaymentMethod('razorpay')}
-                    >
-                      <div className="h-10 w-10 rounded-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center">
-                        <img src="/razorpay-logo.svg" alt="Razorpay" className="h-6 w-6" />
-                      </div>
-                      <span className="font-medium text-museum-900 dark:text-white">Razorpay</span>
+                  <div className="border rounded-lg p-4 flex flex-col items-center gap-2 border-accent-500 bg-accent-50 dark:bg-accent-900/20">
+                    <div className="h-10 w-10 rounded-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center">
+                      <img src="/razorpay-logo.svg" alt="Razorpay" className="h-6 w-6" />
                     </div>
-                    <div
-                      className={cn(
-                        "border rounded-lg p-4 flex flex-col items-center gap-2 cursor-pointer transition-colors",
-                        paymentMethod === 'card' 
-                          ? "border-accent-500 bg-accent-50 dark:bg-accent-900/20" 
-                          : "border-museum-200 dark:border-museum-700 hover:bg-museum-50 dark:hover:bg-museum-800"
-                      )}
-                      onClick={() => setPaymentMethod('card')}
-                    >
-                      <div className="h-10 w-10 rounded-full bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-accent-700 dark:text-accent-400" />
-                      </div>
-                      <span className="font-medium text-museum-900 dark:text-white">Credit Card</span>
-                    </div>
+                    <span className="font-medium text-museum-900 dark:text-white">Razorpay</span>
                   </div>
                 </div>
-
-                {paymentMethod === 'card' && (
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-museum-900 dark:text-white">Card Information</h3>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="cardNumber">{t('payment.cardNumber')}</Label>
-                      <div className="relative">
-                        <Input
-                          id="cardNumber"
-                          name="cardNumber"
-                          placeholder="1234 5678 9012 3456"
-                          value={paymentInfo.cardNumber}
-                          onChange={handleInputChange}
-                          className="pl-10"
-                          required
-                        />
-                        <CreditCard className="absolute left-3 top-2.5 h-4 w-4 text-museum-500 dark:text-museum-400" />
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="cardName">{t('payment.cardName')}</Label>
-                        <Input
-                          id="cardName"
-                          name="cardName"
-                          placeholder="John Doe"
-                          value={paymentInfo.cardName}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-2">
-                          <Label htmlFor="expiryDate">{t('payment.expiry')}</Label>
-                          <Input
-                            id="expiryDate"
-                            name="expiryDate"
-                            placeholder="MM/YY"
-                            value={paymentInfo.expiryDate}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="cvc">CVC</Label>
-                          <Input
-                            id="cvc"
-                            name="cvc"
-                            type="password"
-                            placeholder="123"
-                            value={paymentInfo.cvc}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 
                 <div className="space-y-4 mt-6">
                   <h3 className="font-medium text-museum-900 dark:text-white">Contact Information</h3>
@@ -345,9 +215,7 @@ const PaymentPage: React.FC = () => {
                         Processing...
                       </>
                     ) : (
-                      <>
-                        {paymentMethod === 'razorpay' ? 'Pay with Razorpay' : `${t('payment.pay')} (${totalPrice.toFixed(2)})`}
-                      </>
+                      <>Pay with Razorpay</>
                     )}
                   </Button>
                 </div>
