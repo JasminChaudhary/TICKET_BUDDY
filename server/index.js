@@ -164,10 +164,21 @@ mongoose.connect('mongodb://localhost:27017/ticket-buddy', {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    // Note: In production, use environment variables for these values
     user: process.env.EMAIL_USER || 'placeholder@example.com',
     pass: process.env.EMAIL_PASS || 'placeholder_password',
   },
+  tls: {
+    rejectUnauthorized: false // Helps with development environments
+  }
+});
+
+// Verify email connection on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Email configuration error:', error);
+  } else {
+    console.log('Email server is ready to send messages');
+  }
 });
 
 // Email sending utility function
@@ -190,7 +201,7 @@ const sendTicketEmail = async (email, ticketData) => {
     
     // Create the email content
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'placeholder@example.com',
+      from: `"Ticket Buddy Museum" <${process.env.EMAIL_USER || 'placeholder@example.com'}>`,
       to: email,
       subject: 'Your Ticket Buddy Museum Tickets',
       html: `
@@ -222,6 +233,16 @@ const sendTicketEmail = async (email, ticketData) => {
             </ul>
           </div>
           
+          <div style="background-color: #f9f9f9; border-radius: 5px; padding: 15px; margin-top: 20px; text-align: center;">
+            <p style="color: #4a5568; margin: 0;">
+              <strong>Your Ticket QR Code</strong><br>
+              (Scan at the entrance)
+            </p>
+            <div style="margin: 15px 0;">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`TICKET-${_id}`)}" alt="Ticket QR Code" style="width: 150px; height: 150px;">
+            </div>
+          </div>
+          
           <p style="color: #718096; text-align: center; margin-top: 30px;">
             If you have any questions, please contact us at support@ticketbuddy.example.com
           </p>
@@ -232,10 +253,10 @@ const sendTicketEmail = async (email, ticketData) => {
     // Send the email
     const info = await transporter.sendMail(mailOptions);
     console.log('Ticket email sent:', info.messageId);
-    return true;
+    return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error('Error sending ticket email:', error);
-    return false;
+    return { success: false, error: error.message };
   }
 };
 
@@ -453,13 +474,17 @@ app.post('/api/tickets', authenticate, async (req, res) => {
     await newTicket.save();
 
     // Send confirmation email if email is provided
+    let emailResult = null;
     if (email) {
-      await sendTicketEmail(email, newTicket);
+      emailResult = await sendTicketEmail(email, newTicket);
+      console.log('Email sending result:', emailResult);
     }
 
     res.status(201).json({
       message: 'Tickets booked successfully',
       ticket: newTicket,
+      emailSent: emailResult ? emailResult.success : false,
+      emailDetails: emailResult
     });
   } catch (error) {
     console.error('Ticket booking error:', error);
