@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"  # Frontend Vite port
+      - "3000:3000"  # Backend API port
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/ticket-buddy
+      - JWT_SECRET=your_secure_jwt_secret_for_docker
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - FRONTEND_URL=http://localhost:8080
+    depends_on:
+      - mongo
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - /app/node_modules
+
+  mongo:
+    image: mongo:5
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:

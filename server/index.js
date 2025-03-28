@@ -18,6 +18,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -312,7 +313,7 @@ app.post('/api/auth/signup', async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role || 'user', // Allow setting role during signup, default to 'user'
+      role: role || 'user',
     });
 
     await user.save();
@@ -746,6 +747,16 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
     console.error('Get analytics error:', error);
     res.status(500).json({ message: 'Error retrieving analytics' });
   }
+});
+
+app.get('/', (req, res) => {
+  // Send the index.html file or handle the root route
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+// This should be after your API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 const PORT = process.env.PORT || 3000;

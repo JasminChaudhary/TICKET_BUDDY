@@ -85,7 +85,7 @@ export const PaymentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     // Create a new Razorpay instance
     const razorpay = new window.Razorpay({
-      key: 'rzp_test_QkXkFcvEgnX67b', // Replace with your Razorpay key ID
+      key: 'rzp_test_FkKF7Z6veNARL9', // Replace with your Razorpay key ID
       amount: totalPrice * 100, // Amount is in currency subunits (100 = 1 unit)
       currency: 'USD',
       name: 'Museum Tickets',
