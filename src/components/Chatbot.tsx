@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { MessageSquare, Send, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useChatbot, Message as ChatMessage } from '@/contexts/ChatbotContext';
@@ -12,7 +12,6 @@ const Chatbot: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { t } = useLanguage();
   const location = useLocation();
-  const navigate = useNavigate();
   
   const {
     messages,
@@ -152,18 +151,6 @@ const ChatbotMessage: React.FC<{
   message: ChatMessage;
   onOptionSelect: (value: string) => void;
 }> = ({ message, onOptionSelect }) => {
-  const navigate = useNavigate();
-  
-  const handleOptionClick = (option: { text: string; value: string }) => {
-    // Check if the option is for opening hours, redirect to About page
-    if (option.value === 'opening_hours') {
-      navigate('/about');
-    }
-    
-    // Call the original handler
-    onOptionSelect(option.value);
-  };
-
   if (message.type === 'user') {
     return (
       <div className="flex items-start justify-end gap-2 message-appear">
@@ -254,20 +241,10 @@ const ChatbotMessage: React.FC<{
             {message.options.map((option) => (
               <button
                 key={option.value}
-                onClick={() => handleOptionClick(option)}
-                style={{
-                  backgroundColor: '#2563eb',
-                  color: 'white',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontWeight: 'bold',
-                  border: 'none',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  cursor: 'pointer'
-                }}
+                onClick={() => onOptionSelect(option.value)}
+                className="text-xs px-3 py-1.5 rounded-full bg-white dark:bg-accent-900/20 text-accent-700 dark:text-accent-400 hover:bg-accent-100 dark:hover:bg-accent-900/30 transition-colors border-2 border-accent-200 dark:border-accent-800 shadow-sm"
               >
-                {option.text || option.value}
+                {option.text}
               </button>
             ))}
           </div>
