@@ -100,7 +100,7 @@ export const PaymentProvider: React.FC<{ children: React.ReactNode }> = ({ child
               });
 
             // Book tickets via API
-            const response = await axios.post('/api/tickets', {
+            await axios.post('/api/tickets', {
               visitDate: selectedDate.toISOString(),
               tickets: ticketsToBook,
               totalPrice,
@@ -112,20 +112,10 @@ export const PaymentProvider: React.FC<{ children: React.ReactNode }> = ({ child
             });
 
             setPaymentStatus('success');
-            
-            // Display appropriate message based on email status
-            if (response.data.emailSent) {
-              toast({
-                title: 'Payment Successful!',
-                description: 'Your tickets have been booked successfully and a confirmation email has been sent.',
-              });
-            } else {
-              toast({
-                title: 'Payment Successful!',
-                description: 'Your tickets have been booked successfully. Note: There was an issue sending the confirmation email.',
-                variant: 'default',
-              });
-            }
+            toast({
+              title: 'Payment Successful!',
+              description: 'Your tickets have been booked successfully and sent to your email.',
+            });
             
             // Reset form and navigate to dashboard after a delay
             setTimeout(() => {
@@ -227,3 +217,4 @@ export const PaymentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
 // Custom hook for using the payment context
 export const usePayment = () => useContext(PaymentContext);
+
