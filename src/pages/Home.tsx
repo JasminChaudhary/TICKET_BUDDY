@@ -124,7 +124,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[60vh] sm:h-[70vh] md:h-[80vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=2080" 
@@ -134,15 +134,15 @@ const Home = () => {
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="font-display text-4xl md:text-6xl font-bold mb-6">
+        <div className="relative z-10 text-center text-white px-4 sm:px-6 md:px-8">
+          <h1 className="font-display heading-responsive font-bold mb-4 md:mb-6">
             Welcome to Our Museum
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
+          <p className="text-responsive mb-6 md:mb-8 max-w-2xl mx-auto">
             Discover the wonders of art, history, and culture through our diverse exhibitions and collections.
           </p>
           <Link to="/exhibitions">
-            <Button size="lg" className="bg-accent-700 hover:bg-accent-800 text-white">
+            <Button size="lg" className="bg-accent-700 hover:bg-accent-800 text-white touch-target">
               Explore Exhibitions
             </Button>
           </Link>
@@ -150,10 +150,10 @@ const Home = () => {
       </section>
       
       {/* Current Exhibitions Section */}
-      <section className="py-20 bg-museum-50 dark:bg-museum-900">
-        <div className="container max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-museum-900 dark:text-white mb-4">
+      <section className="py-responsive bg-museum-50 dark:bg-museum-900">
+        <div className="container-responsive">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="font-display subheading-responsive font-bold text-museum-900 dark:text-white mb-4">
               Current Exhibitions
             </h2>
             <p className="text-museum-600 dark:text-museum-300 max-w-2xl mx-auto">
@@ -166,7 +166,7 @@ const Home = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-700"></div>
             </div>
           ) : currentExhibitions.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="card-grid">
               {currentExhibitions.map((exhibition, index) => (
                 <ExhibitionCard 
                   key={exhibition.id} 
@@ -186,10 +186,10 @@ const Home = () => {
       </section>
       
       {/* Upcoming Exhibitions Section */}
-      <section className="py-20">
-        <div className="container max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-museum-900 dark:text-white mb-4">
+      <section className="py-responsive">
+        <div className="container-responsive">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="font-display subheading-responsive font-bold text-museum-900 dark:text-white mb-4">
               Upcoming Exhibitions
             </h2>
             <p className="text-museum-600 dark:text-museum-300 max-w-2xl mx-auto">
@@ -202,7 +202,7 @@ const Home = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-700"></div>
             </div>
           ) : upcomingExhibitions.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="card-grid">
               {upcomingExhibitions.map((exhibition, index) => (
                 <ExhibitionCard 
                   key={exhibition.id} 
@@ -222,10 +222,10 @@ const Home = () => {
       </section>
       
       {/* Features Section */}
-      <section className="py-20 bg-museum-50 dark:bg-museum-900">
-        <div className="container max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-museum-900 dark:text-white mb-4">
+      <section className="py-responsive bg-museum-50 dark:bg-museum-900">
+        <div className="container-responsive">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="font-display subheading-responsive font-bold text-museum-900 dark:text-white mb-4">
               Why Visit Our Museum?
             </h2>
             <p className="text-museum-600 dark:text-museum-300 max-w-2xl mx-auto">
@@ -233,7 +233,7 @@ const Home = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             <FeatureCard
               title="Diverse Collections"
               description="Explore our extensive collection of art, artifacts, and historical pieces from around the world."
@@ -287,94 +287,59 @@ const ExhibitionCard: React.FC<{
   isLoaded: boolean;
   index: number;
 }> = ({ exhibition, onShare, isLoaded, index }) => {
-  const isPast = exhibition.category === 'past';
+  // Staggered animation delay based on index
+  const animationDelay = `${index * 100}ms`;
   
   return (
-    <Card 
-      className={cn(
-        "overflow-hidden border-museum-200 dark:border-museum-700 transition-all duration-500",
-        isPast ? "opacity-80" : "hover-scale",
-        isLoaded && "animate-scale-in"
-      )}
-      style={{ animationDelay: `${index * 100}ms` }}
-    >
-      <div className="relative h-48 overflow-hidden">
+    <Card className={cn(
+      "overflow-hidden hover-scale h-full flex flex-col",
+      isLoaded ? "opacity-100" : "opacity-0",
+    )}
+    style={{ transitionDelay: animationDelay }}>
+      <div className="relative aspect-[3/2] overflow-hidden">
         <img 
-          src={exhibition.image} 
-          alt={exhibition.title} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          src={exhibition.image || "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?q=80&w=2071"} 
+          alt={exhibition.title}
+          className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
         />
-        <div className="absolute top-3 right-3">
-          <Badge className={cn(
-            "text-xs py-1",
-            exhibition.category === 'current' ? "bg-green-500" : 
-            exhibition.category === 'upcoming' ? "bg-blue-500" : 
-            "bg-museum-500"
-          )}>
-            {exhibition.category.charAt(0).toUpperCase() + exhibition.category.slice(1)}
+        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-gradient-to-t from-black/80 to-transparent">
+          <Badge variant="outline" className="bg-white/90 text-foreground text-xs">
+            {exhibition.category === 'current' ? 'Now Showing' : 'Opening Soon'}
           </Badge>
         </div>
       </div>
       
-      <CardHeader>
-        <CardTitle className="text-xl">{exhibition.title}</CardTitle>
-        <CardDescription>
-          <div className="flex items-center gap-1 text-museum-500 dark:text-museum-400">
-            <Calendar className="h-3.5 w-3.5" />
-            <span className="text-sm">{exhibition.date}</span>
-          </div>
+      <CardHeader className="p-4 sm:p-5 pb-2 sm:pb-3">
+        <CardTitle className="text-xl sm:text-2xl leading-tight">{exhibition.title}</CardTitle>
+        <CardDescription className="line-clamp-2 mt-1 sm:mt-2">
+          {exhibition.description}
         </CardDescription>
       </CardHeader>
       
-      <CardContent>
-        <p className="text-sm text-museum-600 dark:text-museum-300 line-clamp-3">
-          {exhibition.description}
-        </p>
-        
-        <div className="mt-4 space-y-2">
-          <div className="flex items-start gap-2 text-sm">
-            <Clock className="h-4 w-4 text-museum-500 dark:text-museum-400 mt-0.5" />
-            <span className="text-museum-700 dark:text-museum-300">{exhibition.duration}</span>
-          </div>
-          <div className="flex items-start gap-2 text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-museum-500 dark:text-museum-400 mt-0.5">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            <span className="text-museum-700 dark:text-museum-300">{exhibition.location}</span>
-          </div>
-          <div className="flex items-start gap-2 text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-museum-500 dark:text-museum-400 mt-0.5">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <span className="text-museum-700 dark:text-museum-300">${exhibition.price}</span>
-          </div>
+      <CardContent className="p-4 sm:p-5 pt-0 space-y-2 sm:space-y-3 flex-grow">
+        <div className="flex items-center text-sm text-muted-foreground">
+          <Calendar className="h-4 w-4 mr-2" />
+          <span>{exhibition.date}</span>
+        </div>
+        <div className="flex items-center text-sm text-muted-foreground">
+          <Clock className="h-4 w-4 mr-2" />
+          <span>{exhibition.duration}</span>
+        </div>
+        <div className="font-medium mt-2 sm:mt-3">
+          ${exhibition.price.toFixed(2)} per person
         </div>
       </CardContent>
       
-      <CardFooter className="flex justify-between gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => onShare(exhibition)}
-          className="flex-1"
-        >
-          <Share2 className="h-4 w-4 mr-2" />
-          Share
-        </Button>
-        
-        <Link to="/tickets" className="flex-1">
-          <Button 
-            size="sm" 
-            className="w-full bg-accent-700 hover:bg-accent-800 text-white"
-            disabled={isPast}
-          >
+      <CardFooter className="p-4 sm:p-5 pt-2 sm:pt-3 flex gap-2 mt-auto">
+        <Link to={`/exhibitions`} className="flex-1">
+          <Button variant="default" className="w-full">
             <Ticket className="h-4 w-4 mr-2" />
-            {isPast ? 'Ended' : 'Get Tickets'}
+            <span>Details</span>
           </Button>
         </Link>
+        <Button variant="outline" size="icon" onClick={() => onShare(exhibition)} className="touch-target">
+          <Share2 className="h-4 w-4" />
+        </Button>
       </CardFooter>
     </Card>
   );

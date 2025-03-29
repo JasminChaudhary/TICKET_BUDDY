@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     maxlength: 60,
   },
+  username: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow multiple documents with no username field
+  },
   email: {
     type: String,
     required: true,
@@ -154,7 +159,7 @@ const exhibitionSchema = new mongoose.Schema({
 const Exhibition = mongoose.model('Exhibition', exhibitionSchema);
 
 // Configure mongoose
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ticket-buddy', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://jasmin:jasmin@cluster0.lwjgjj3.mongodb.net/', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -296,6 +301,7 @@ const authenticateAdmin = async (req, res, next) => {
 // Routes
 app.post('/api/auth/signup', async (req, res) => {
   try {
+    console.log('Signup request received:', req.body);
     const { name, email, password, role } = req.body;
 
     // Check if user already exists
@@ -303,15 +309,22 @@ app.post('/api/auth/signup', async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
+    console.log('1');
+
+    // Generate username from email
+    const username = email.split('@')[0];
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    console.log('2');
+
     // Create new user
     const user = new User({
       name,
       email,
+      username, // Add username field
       password: hashedPassword,
       role: role || 'user',
     });
@@ -325,6 +338,8 @@ app.post('/api/auth/signup', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    console.log('3');
+
     res.status(201).json({
       message: 'User created successfully',
       token,
@@ -335,6 +350,8 @@ app.post('/api/auth/signup', async (req, res) => {
         role: user.role,
       },
     });
+
+    console.log('4');
   } catch (error) {
     console.error('Signup error:', error);
     res.status(500).json({ message: 'Error creating user' });
@@ -750,11 +767,9 @@ app.get('/api/admin/analytics', authenticateAdmin, async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  // Send the index.html file or handle the root route
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
-// This should be after your API routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });

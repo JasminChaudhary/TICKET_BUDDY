@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -162,5 +161,81 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Responsive utilities */
+@layer utilities {
+  /* Responsive text sizes */
+  .text-responsive {
+    @apply text-base md:text-lg lg:text-xl;
+  }
+  
+  .heading-responsive {
+    @apply text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
+  }
+  
+  .subheading-responsive {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+  
+  /* Responsive spacing */
+  .p-responsive {
+    @apply p-4 md:p-6 lg:p-8;
+  }
+  
+  .py-responsive {
+    @apply py-6 md:py-8 lg:py-12;
+  }
+  
+  .px-responsive {
+    @apply px-4 md:px-6 lg:px-8;
+  }
+  
+  .m-responsive {
+    @apply m-4 md:m-6 lg:m-8;
+  }
+  
+  .my-responsive {
+    @apply my-6 md:my-8 lg:my-12;
+  }
+  
+  .mx-responsive {
+    @apply mx-4 md:mx-6 lg:mx-8;
+  }
+  
+  /* Responsive layout */
+  .container-responsive {
+    @apply w-full max-w-[90%] md:max-w-[85%] lg:max-w-[80%] xl:max-w-6xl mx-auto;
+  }
+  
+  /* Responsive cards */
+  .card-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8;
+  }
+  
+  /* Better touch targets for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
+
+/* Small device fixes */
+@media (max-width: 640px) {
+  input, select, textarea, button {
+    @apply text-base;
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Improve table display on mobile */
+  table {
+    @apply block w-full overflow-x-auto;
+  }
+}
+
+/* Fix for position fixed on iOS */
+@supports (-webkit-overflow-scrolling: touch) {
+  .ios-fixed {
+    @apply sticky top-0 z-50;
   }
 }

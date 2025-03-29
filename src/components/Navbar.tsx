@@ -248,49 +248,53 @@ const Navbar: React.FC = () => {
       {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
+          <div className="pt-2 pb-4 px-2 space-y-1 bg-background border-b border-border shadow-lg">
             <Link
               to="/tickets"
+              onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
-                "block pl-3 pr-4 py-2 text-base font-medium",
+                "block touch-target px-4 py-3 rounded-md text-base font-medium",
                 location.pathname === '/tickets'
-                  ? "text-primary bg-primary/10"
-                  : "text-foreground hover:text-primary hover:bg-primary/5"
+                  ? "bg-primary/10 text-primary"
+                  : "text-foreground hover:bg-muted"
               )}
             >
               {t('nav.tickets')}
             </Link>
             <Link
               to="/exhibitions"
+              onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
-                "block pl-3 pr-4 py-2 text-base font-medium",
+                "block touch-target px-4 py-3 rounded-md text-base font-medium",
                 location.pathname === '/exhibitions'
-                  ? "text-primary bg-primary/10"
-                  : "text-foreground hover:text-primary hover:bg-primary/5"
+                  ? "bg-primary/10 text-primary"
+                  : "text-foreground hover:bg-muted"
               )}
             >
               {t('nav.exhibitions')}
             </Link>
             <Link
               to="/about"
+              onClick={() => setIsMobileMenuOpen(false)}
               className={cn(
-                "block pl-3 pr-4 py-2 text-base font-medium",
+                "block touch-target px-4 py-3 rounded-md text-base font-medium",
                 location.pathname === '/about'
-                  ? "text-primary bg-primary/10"
-                  : "text-foreground hover:text-primary hover:bg-primary/5"
+                  ? "bg-primary/10 text-primary"
+                  : "text-foreground hover:bg-muted"
               )}
             >
               {t('nav.about')}
             </Link>
-            {user ? (
+            {user && (
               <>
                 <Link
                   to="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
-                    "block pl-3 pr-4 py-2 text-base font-medium",
+                    "block touch-target px-4 py-3 rounded-md text-base font-medium",
                     location.pathname === '/dashboard'
-                      ? "text-primary bg-primary/10"
-                      : "text-foreground hover:text-primary hover:bg-primary/5"
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
                   )}
                 >
                   {t('nav.myTickets')}
@@ -298,32 +302,38 @@ const Navbar: React.FC = () => {
                 {user.role === 'admin' && (
                   <Link
                     to="/admin"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className={cn(
-                      "block pl-3 pr-4 py-2 text-base font-medium",
+                      "block touch-target px-4 py-3 rounded-md text-base font-medium",
                       location.pathname === '/admin'
-                        ? "text-primary bg-primary/10"
-                        : "text-foreground hover:text-primary hover:bg-primary/5"
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground hover:bg-muted"
                     )}
                   >
                     {t('nav.adminPanel')}
                   </Link>
                 )}
               </>
-            ) : (
-              <>
-                <Link
+            )}
+            {!user && (
+              <div className="flex flex-col space-y-2 mt-4 px-4">
+                <Link 
                   to="/login"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {t('nav.login')}
+                  <Button variant="outline" className="w-full justify-center">
+                    {t('nav.login')}
+                  </Button>
                 </Link>
-                <Link
+                <Link 
                   to="/signup"
-                  className="block pl-3 pr-4 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-primary/5"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {t('nav.signup')}
+                  <Button className="w-full justify-center">
+                    {t('nav.signup')}
+                  </Button>
                 </Link>
-              </>
+              </div>
             )}
           </div>
         </div>
